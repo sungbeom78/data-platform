@@ -1,0 +1,7 @@
+{
+  "name": "data-platform",
+  "version": "2.1.0",
+  "description": "데이터 모델링 + 데이터 관리 시스템: 공공데이터 검색, 파일/URL 적재, 개인정보 분리·암호화, 등급×분류 접근 권한, 등록 쿼리 조회 API",
+  "author": { "name": "안숭범 (AI Data Architect)" },
+  "keywords": ["data-modeling", "postgresql", "public-data", "privacy", "access-control", "api"]
+}

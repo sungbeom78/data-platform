@@ -1,0 +1,895 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="1.1.0" use-changelog="false" max-obj-count="25" last-position="0,0" last-zoom="1" scene-rect="0,0,2600,1600" default-schema="public" default-owner="postgres" layers="Default layer" active-layers="0" layer-name-colors="#000000" layer-rect-colors="#b4b4b4" show-layer-names="false" show-layer-rects="false">
+<database name="sec_db" is-template="false" allow-conns="true">
+</database>
+<schema name="public" layers="0" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
+</schema>
+<schema name="sec" layers="0" rect-visible="true" fill-color="#e1e1e1" name-color="#000000">
+	<role name="postgres"/>
+</schema>
+<schema name="api" layers="0" rect-visible="true" fill-color="#e1e1e1" name-color="#000000">
+	<role name="postgres"/>
+</schema>
+<schema name="ingest" layers="0" rect-visible="true" fill-color="#e1e1e1" name-color="#000000">
+	<role name="postgres"/>
+</schema>
+<table name="grade" alias="등급" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[등급 — 접근 등급. rank 가 클수록 상위(s=100). 계정은 등급 하나]]> </comment>
+	<position x="2000" y="60"/>
+	<column name="grade_cd" alias="등급코드" not-null="true">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[등급코드]]> </comment>
+	</column>
+	<column name="grade_nm" alias="등급명" not-null="true">
+		<type name="varchar" length="100"/>
+		<comment> <![CDATA[등급명]]> </comment>
+	</column>
+	<column name="grade_rank" alias="등급순위" not-null="true">
+		<type name="smallint" length="0"/>
+		<comment> <![CDATA[등급순위]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_grade" type="pk-constr" table="sec.grade">
+		<columns names="grade_cd" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_grade_grade_rank" type="uq-constr" table="sec.grade">
+		<columns names="grade_rank" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_grade_grade_rank" type="ck-constr" table="sec.grade">
+		<expression> <![CDATA[grade_rank BETWEEN 0 AND 1000]]> </expression>
+	</constraint>
+</table>
+<table name="category" alias="분류" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[분류 — 데이터 분류. 계정은 여러 분류 권한을 가질 수 있음]]> </comment>
+	<position x="2440" y="60"/>
+	<column name="ctgr_cd" alias="분류코드" not-null="true">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[분류코드]]> </comment>
+	</column>
+	<column name="ctgr_nm" alias="분류명" not-null="true">
+		<type name="varchar" length="100"/>
+		<comment> <![CDATA[분류명]]> </comment>
+	</column>
+	<column name="sort_no" alias="순서번호" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[순서번호]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_category" type="pk-constr" table="sec.category">
+		<columns names="ctgr_cd" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="account" alias="계정" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[계정 — 개인·팀·시스템 계정. 등급 1개 + 관리자 여부. 비밀번호는 argon2id 단방향]]> </comment>
+	<position x="80" y="420"/>
+	<column name="acct_id" alias="계정식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="login_id" alias="로그인식별자" not-null="true">
+		<type name="varchar" length="50"/>
+		<comment> <![CDATA[로그인식별자]]> </comment>
+	</column>
+	<column name="acct_nm" alias="계정명" not-null="true">
+		<type name="varchar" length="100"/>
+		<comment> <![CDATA[계정명]]> </comment>
+	</column>
+	<column name="acct_type_cd" alias="계정유형코드" not-null="true" default-value="'USER'">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[계정유형코드]]> </comment>
+	</column>
+	<column name="grade_cd" alias="등급코드" not-null="true">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[등급코드]]> </comment>
+	</column>
+	<column name="admin_yn" alias="관리자여부" not-null="true" default-value="false">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[관리자여부]]> </comment>
+	</column>
+	<column name="pwd_hash" alias="비밀번호해시">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[비밀번호해시]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_account" type="pk-constr" table="sec.account">
+		<columns names="acct_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_account_login_id" type="uq-constr" table="sec.account">
+		<columns names="login_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_account_login_id" type="ck-constr" table="sec.account">
+		<expression> <![CDATA[login_id ~ '^[a-z][a-z0-9_.-]{2,49}$']]> </expression>
+	</constraint>
+	<constraint name="ck_account_acct_type_cd" type="ck-constr" table="sec.account">
+		<expression> <![CDATA[acct_type_cd IN ('USER','TEAM','SYSTEM')]]> </expression>
+	</constraint>
+</table>
+<table name="account_category" alias="계정분류권한" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[계정분류권한 — 계정이 보유한 분류 권한(N:M)]]> </comment>
+	<position x="300" y="820"/>
+	<column name="acct_id" alias="계정식별자" not-null="true">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="ctgr_cd" alias="분류코드" not-null="true">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[분류코드]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_account_category" type="pk-constr" table="sec.account_category">
+		<columns names="acct_id,ctgr_cd" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="account_key" alias="계정키" layers="0" collapse-mode="2" max-obj-count="12" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[계정키 — 팀·시스템 계정용 API 키. 키 원문은 저장하지 않고 HMAC 해시만 보관]]> </comment>
+	<position x="520" y="420"/>
+	<column name="key_id" alias="키식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[키식별자]]> </comment>
+	</column>
+	<column name="acct_id" alias="계정식별자" not-null="true">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="key_prefix" alias="키접두" not-null="true">
+		<type name="varchar" length="12"/>
+		<comment> <![CDATA[키접두]]> </comment>
+	</column>
+	<column name="key_hash" alias="키해시" not-null="true">
+		<type name="bytea" length="0"/>
+		<comment> <![CDATA[키해시]]> </comment>
+	</column>
+	<column name="expire_at" alias="만료시각">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[만료시각]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_account_key" type="pk-constr" table="sec.account_key">
+		<columns names="key_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_account_key_key_prefix" type="uq-constr" table="sec.account_key">
+		<columns names="key_prefix" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="role" alias="역할" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[역할 — 분류 권한·API 사용권한 묶음. 계정에 역할을 주면 묶음 전체가 부여됨]]> </comment>
+	<position x="960" y="420"/>
+	<column name="role_cd" alias="역할코드" not-null="true">
+		<type name="varchar" length="30"/>
+		<comment> <![CDATA[역할코드]]> </comment>
+	</column>
+	<column name="role_nm" alias="역할명" not-null="true">
+		<type name="varchar" length="100"/>
+		<comment> <![CDATA[역할명]]> </comment>
+	</column>
+	<column name="role_desc" alias="역할설명">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[역할설명]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_role" type="pk-constr" table="sec.role">
+		<columns names="role_cd" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="role_category" alias="역할분류권한" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[역할분류권한 — 역할이 가진 분류 권한]]> </comment>
+	<position x="740" y="820"/>
+	<column name="role_cd" alias="역할코드" not-null="true">
+		<type name="varchar" length="30"/>
+		<comment> <![CDATA[역할코드]]> </comment>
+	</column>
+	<column name="ctgr_cd" alias="분류코드" not-null="true">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[분류코드]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_role_category" type="pk-constr" table="sec.role_category">
+		<columns names="role_cd,ctgr_cd" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="role_member" alias="역할멤버" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[역할멤버 — 역할을 부여받은 계정]]> </comment>
+	<position x="1180" y="820"/>
+	<column name="role_cd" alias="역할코드" not-null="true">
+		<type name="varchar" length="30"/>
+		<comment> <![CDATA[역할코드]]> </comment>
+	</column>
+	<column name="acct_id" alias="계정식별자" not-null="true">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_role_member" type="pk-constr" table="sec.role_member">
+		<columns names="role_cd,acct_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="audit_log" alias="감사로그" layers="0" collapse-mode="2" max-obj-count="11" z-value="0">
+	<schema name="sec"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[감사로그 — 계정·권한·정책·API 변경 기록]]> </comment>
+	<position x="1500" y="820"/>
+	<column name="log_id" alias="로그식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[로그식별자]]> </comment>
+	</column>
+	<column name="acct_id" alias="계정식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="act_cd" alias="행위코드" not-null="true">
+		<type name="varchar" length="30"/>
+		<comment> <![CDATA[행위코드]]> </comment>
+	</column>
+	<column name="target_val" alias="대상값">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[대상값]]> </comment>
+	</column>
+	<column name="dtl_val" alias="상세값">
+		<type name="jsonb" length="0"/>
+		<comment> <![CDATA[상세값]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_audit_log" type="pk-constr" table="sec.audit_log">
+		<columns names="log_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="object_policy" alias="객체정책" layers="0" collapse-mode="2" max-obj-count="12" z-value="0">
+	<schema name="meta"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[객체정책 — 스키마/테이블별 최소 등급·분류. 정책이 없으면 전체 허용. table_nm='*' 는 스키마 전체, 테이블 정책이 우선]]> </comment>
+	<position x="1400" y="420"/>
+	<column name="plcy_id" alias="정책식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[정책식별자]]> </comment>
+	</column>
+	<column name="schema_nm" alias="스키마명" not-null="true">
+		<type name="varchar" length="63"/>
+		<comment> <![CDATA[스키마명]]> </comment>
+	</column>
+	<column name="table_nm" alias="테이블명" not-null="true" default-value="'*'">
+		<type name="varchar" length="63"/>
+		<comment> <![CDATA[테이블명]]> </comment>
+	</column>
+	<column name="min_grade_cd" alias="최소등급코드">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[최소등급코드]]> </comment>
+	</column>
+	<column name="ctgr_cd" alias="분류코드">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[분류코드]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_object_policy" type="pk-constr" table="meta.object_policy">
+		<columns names="plcy_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_object_policy_schema_nm_table_nm" type="uq-constr" table="meta.object_policy">
+		<columns names="schema_nm,table_nm" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="api_definition" alias="API정의" layers="0" collapse-mode="2" max-obj-count="15" z-value="0">
+	<schema name="api"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[API정의 — 등록 쿼리 기반 조회 API. SELECT 단일문만 허용, 호출자 DB 권한으로 실행]]> </comment>
+	<position x="1840" y="420"/>
+	<column name="api_id" alias="API식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[API식별자]]> </comment>
+	</column>
+	<column name="api_nm" alias="API명" not-null="true">
+		<type name="varchar" length="63"/>
+		<comment> <![CDATA[API명]]> </comment>
+	</column>
+	<column name="api_desc" alias="API설명">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[API설명]]> </comment>
+	</column>
+	<column name="sql_val" alias="SQL값" not-null="true">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[SQL값]]> </comment>
+	</column>
+	<column name="param_val" alias="파라미터값" not-null="true" default-value="'[]'::jsonb">
+		<type name="jsonb" length="0"/>
+		<comment> <![CDATA[파라미터값]]> </comment>
+	</column>
+	<column name="max_row_cnt" alias="최대행수" not-null="true" default-value="10000">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[최대행수]]> </comment>
+	</column>
+	<column name="timeout_ms" alias="제한시간밀리초" not-null="true" default-value="15000">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[제한시간밀리초]]> </comment>
+	</column>
+	<column name="owner_acct_id" alias="소유계정식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[소유계정식별자]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_api_definition" type="pk-constr" table="api.api_definition">
+		<columns names="api_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_api_definition_api_nm" type="uq-constr" table="api.api_definition">
+		<columns names="api_nm" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_api_definition_api_nm" type="ck-constr" table="api.api_definition">
+		<expression> <![CDATA[api_nm ~ '^[a-z][a-z0-9_]{1,62}$']]> </expression>
+	</constraint>
+	<constraint name="ck_api_definition_max_row_cnt" type="ck-constr" table="api.api_definition">
+		<expression> <![CDATA[max_row_cnt >= 0]]> </expression>
+	</constraint>
+	<constraint name="ck_api_definition_timeout_ms" type="ck-constr" table="api.api_definition">
+		<expression> <![CDATA[timeout_ms BETWEEN 100 AND 600000]]> </expression>
+	</constraint>
+</table>
+<table name="api_grant" alias="API사용권한" layers="0" collapse-mode="2" max-obj-count="11" z-value="0">
+	<schema name="api"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[API사용권한 — API 사용권한 — 계정 또는 역할 단위로 관리자만 부여]]> </comment>
+	<position x="1620" y="820"/>
+	<column name="grant_id" alias="부여식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[부여식별자]]> </comment>
+	</column>
+	<column name="api_id" alias="API식별자" not-null="true">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[API식별자]]> </comment>
+	</column>
+	<column name="acct_id" alias="계정식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="role_cd" alias="역할코드">
+		<type name="varchar" length="30"/>
+		<comment> <![CDATA[역할코드]]> </comment>
+	</column>
+	<column name="grant_acct_id" alias="부여계정식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[부여계정식별자]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_api_grant" type="pk-constr" table="api.api_grant">
+		<columns names="grant_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_api_grant_api_id_acct_id" type="uq-constr" table="api.api_grant">
+		<columns names="api_id,acct_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_api_grant_api_id_role_cd" type="uq-constr" table="api.api_grant">
+		<columns names="api_id,role_cd" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_api_grant_target" type="ck-constr" table="api.api_grant">
+		<expression> <![CDATA[(acct_id IS NOT NULL) <> (role_cd IS NOT NULL)]]> </expression>
+	</constraint>
+</table>
+<table name="action_policy" alias="행위정책" layers="0" collapse-mode="2" max-obj-count="11" z-value="0">
+	<schema name="api"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[행위정책 — 플랫폼 행위별 최소 등급·관리자 필요 여부(로그인=목록 조회 이상)]]> </comment>
+	<position x="2880" y="60"/>
+	<column name="act_cd" alias="행위코드" not-null="true">
+		<type name="varchar" length="30"/>
+		<comment> <![CDATA[행위코드]]> </comment>
+	</column>
+	<column name="act_nm" alias="행위명" not-null="true">
+		<type name="varchar" length="100"/>
+		<comment> <![CDATA[행위명]]> </comment>
+	</column>
+	<column name="min_grade_cd" alias="최소등급코드" not-null="true">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[최소등급코드]]> </comment>
+	</column>
+	<column name="admin_yn" alias="관리자여부" not-null="true" default-value="false">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[관리자여부]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_action_policy" type="pk-constr" table="api.action_policy">
+		<columns names="act_cd" ref-type="src-columns"/>
+	</constraint>
+</table>
+<table name="call_log" alias="호출로그" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
+	<schema name="api"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[호출로그 — API 호출 기록. 파라미터 원문 대신 HMAC 해시]]> </comment>
+	<position x="1940" y="820"/>
+	<column name="log_id" alias="로그식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[로그식별자]]> </comment>
+	</column>
+	<column name="api_id" alias="API식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[API식별자]]> </comment>
+	</column>
+	<column name="acct_id" alias="계정식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="param_hash" alias="파라미터해시">
+		<type name="bytea" length="0"/>
+		<comment> <![CDATA[파라미터해시]]> </comment>
+	</column>
+	<column name="row_cnt" alias="행수">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[행수]]> </comment>
+	</column>
+	<column name="elapsed_ms" alias="경과밀리초">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[경과밀리초]]> </comment>
+	</column>
+	<column name="result_cd" alias="결과코드" not-null="true">
+		<type name="varchar" length="30"/>
+		<comment> <![CDATA[결과코드]]> </comment>
+	</column>
+	<column name="msg_val" alias="메시지값">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[메시지값]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_call_log" type="pk-constr" table="api.call_log">
+		<columns names="log_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_call_log_row_cnt" type="ck-constr" table="api.call_log">
+		<expression> <![CDATA[row_cnt >= 0]]> </expression>
+	</constraint>
+	<constraint name="ck_call_log_elapsed_ms" type="ck-constr" table="api.call_log">
+		<expression> <![CDATA[elapsed_ms >= 0]]> </expression>
+	</constraint>
+</table>
+<table name="source" alias="원천" layers="0" collapse-mode="2" max-obj-count="14" z-value="0">
+	<schema name="ingest"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[원천 — 데이터 출처(파일·URL·API·공공데이터)]]> </comment>
+	<position x="2280" y="420"/>
+	<column name="src_id" alias="원천식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[원천식별자]]> </comment>
+	</column>
+	<column name="src_nm" alias="원천명" not-null="true">
+		<type name="varchar" length="200"/>
+		<comment> <![CDATA[원천명]]> </comment>
+	</column>
+	<column name="src_type_cd" alias="원천유형코드" not-null="true">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[원천유형코드]]> </comment>
+	</column>
+	<column name="src_url" alias="원천URL">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[원천URL]]> </comment>
+	</column>
+	<column name="provider_nm" alias="제공명">
+		<type name="varchar" length="100"/>
+		<comment> <![CDATA[제공명]]> </comment>
+	</column>
+	<column name="license_nm" alias="라이선스명">
+		<type name="varchar" length="100"/>
+		<comment> <![CDATA[라이선스명]]> </comment>
+	</column>
+	<column name="src_desc" alias="원천설명">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[원천설명]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_source" type="pk-constr" table="ingest.source">
+		<columns names="src_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_source_src_type_cd" type="ck-constr" table="ingest.source">
+		<expression> <![CDATA[src_type_cd IN ('FILE','URL','API','PUBLIC')]]> </expression>
+	</constraint>
+</table>
+<table name="job" alias="작업" layers="0" collapse-mode="2" max-obj-count="20" z-value="0">
+	<schema name="ingest"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[작업 — 적재 작업 1건 = 원천 1개 → 대상 테이블/데이터셋 1개]]> </comment>
+	<position x="2060" y="820"/>
+	<column name="job_id" alias="작업식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[작업식별자]]> </comment>
+	</column>
+	<column name="src_id" alias="원천식별자" not-null="true">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[원천식별자]]> </comment>
+	</column>
+	<column name="target_schema_nm" alias="대상스키마명">
+		<type name="varchar" length="63"/>
+		<comment> <![CDATA[대상스키마명]]> </comment>
+	</column>
+	<column name="target_table_nm" alias="대상테이블명">
+		<type name="varchar" length="63"/>
+		<comment> <![CDATA[대상테이블명]]> </comment>
+	</column>
+	<column name="store_type_cd" alias="저장유형코드" not-null="true" default-value="'DB'">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[저장유형코드]]> </comment>
+	</column>
+	<column name="status_cd" alias="상태코드" not-null="true" default-value="'READY'">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[상태코드]]> </comment>
+	</column>
+	<column name="row_cnt" alias="행수">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[행수]]> </comment>
+	</column>
+	<column name="byte_cnt" alias="바이트수">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[바이트수]]> </comment>
+	</column>
+	<column name="profile_val" alias="프로파일값">
+		<type name="jsonb" length="0"/>
+		<comment> <![CDATA[프로파일값]]> </comment>
+	</column>
+	<column name="msg_val" alias="메시지값">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[메시지값]]> </comment>
+	</column>
+	<column name="aprv_val" alias="승인값">
+		<type name="jsonb" length="0"/>
+		<comment> <![CDATA[승인값]]> </comment>
+	</column>
+	<column name="start_at" alias="시작시각">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[시작시각]]> </comment>
+	</column>
+	<column name="end_at" alias="종료시각">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[종료시각]]> </comment>
+	</column>
+	<column name="acct_id" alias="계정식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[계정식별자]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_job" type="pk-constr" table="ingest.job">
+		<columns names="job_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_job_store_type_cd" type="ck-constr" table="ingest.job">
+		<expression> <![CDATA[store_type_cd IN ('DB','LAKE')]]> </expression>
+	</constraint>
+	<constraint name="ck_job_status_cd" type="ck-constr" table="ingest.job">
+		<expression> <![CDATA[status_cd IN ('READY','RUNNING','DONE','FAIL')]]> </expression>
+	</constraint>
+	<constraint name="ck_job_row_cnt" type="ck-constr" table="ingest.job">
+		<expression> <![CDATA[row_cnt >= 0]]> </expression>
+	</constraint>
+	<constraint name="ck_job_byte_cnt" type="ck-constr" table="ingest.job">
+		<expression> <![CDATA[byte_cnt >= 0]]> </expression>
+	</constraint>
+</table>
+<table name="lake_dataset" alias="레이크데이터셋" layers="0" collapse-mode="2" max-obj-count="15" z-value="0">
+	<schema name="ingest"/>
+	<role name="postgres"/>
+	<comment> <![CDATA[레이크데이터셋 — 디스크(Parquet) 기반 대용량·로그성 데이터 카탈로그. 조회는 DuckDB]]> </comment>
+	<position x="2720" y="420"/>
+	<column name="dataset_id" alias="데이터셋식별자" not-null="true" identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[데이터셋식별자]]> </comment>
+	</column>
+	<column name="dataset_nm" alias="데이터셋명" not-null="true">
+		<type name="varchar" length="63"/>
+		<comment> <![CDATA[데이터셋명]]> </comment>
+	</column>
+	<column name="path_val" alias="경로값" not-null="true">
+		<type name="text" length="0"/>
+		<comment> <![CDATA[경로값]]> </comment>
+	</column>
+	<column name="partition_col_nm" alias="파티션컬럼명">
+		<type name="varchar" length="63"/>
+		<comment> <![CDATA[파티션컬럼명]]> </comment>
+	</column>
+	<column name="file_fmt_cd" alias="파일형식코드" not-null="true" default-value="'PARQUET'">
+		<type name="varchar" length="10"/>
+		<comment> <![CDATA[파일형식코드]]> </comment>
+	</column>
+	<column name="row_cnt" alias="행수">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[행수]]> </comment>
+	</column>
+	<column name="byte_cnt" alias="바이트수">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[바이트수]]> </comment>
+	</column>
+	<column name="src_id" alias="원천식별자">
+		<type name="bigint" length="0"/>
+		<comment> <![CDATA[원천식별자]]> </comment>
+	</column>
+	<column name="use_yn" alias="사용여부" not-null="true" default-value="true">
+		<type name="boolean" length="0"/>
+		<comment> <![CDATA[사용여부]]> </comment>
+	</column>
+	<column name="created_at" alias="생성시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[생성시각]]> </comment>
+	</column>
+	<column name="updated_at" alias="수정시각" not-null="true" default-value="now()">
+		<type name="timestamptz" length="0"/>
+		<comment> <![CDATA[수정시각]]> </comment>
+	</column>
+	<constraint name="pk_lake_dataset" type="pk-constr" table="ingest.lake_dataset">
+		<columns names="dataset_id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="uk_lake_dataset_dataset_nm" type="uq-constr" table="ingest.lake_dataset">
+		<columns names="dataset_nm" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="ck_lake_dataset_row_cnt" type="ck-constr" table="ingest.lake_dataset">
+		<expression> <![CDATA[row_cnt >= 0]]> </expression>
+	</constraint>
+	<constraint name="ck_lake_dataset_byte_cnt" type="ck-constr" table="ingest.lake_dataset">
+		<expression> <![CDATA[byte_cnt >= 0]]> </expression>
+	</constraint>
+</table>
+<constraint name="fk_account_grade_grade_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="RESTRICT" ref-table="sec.grade" table="sec.account">
+	<columns names="grade_cd" ref-type="src-columns"/>
+	<columns names="grade_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_account_category_account_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="sec.account" table="sec.account_category">
+	<columns names="acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_account_category_category_ctgr_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="RESTRICT" ref-table="sec.category" table="sec.account_category">
+	<columns names="ctgr_cd" ref-type="src-columns"/>
+	<columns names="ctgr_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_account_key_account_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="sec.account" table="sec.account_key">
+	<columns names="acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_role_category_role_role_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="sec.role" table="sec.role_category">
+	<columns names="role_cd" ref-type="src-columns"/>
+	<columns names="role_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_role_category_category_ctgr_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="RESTRICT" ref-table="sec.category" table="sec.role_category">
+	<columns names="ctgr_cd" ref-type="src-columns"/>
+	<columns names="ctgr_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_role_member_role_role_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="sec.role" table="sec.role_member">
+	<columns names="role_cd" ref-type="src-columns"/>
+	<columns names="role_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_role_member_account_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="sec.account" table="sec.role_member">
+	<columns names="acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_audit_log_account_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="SET NULL" ref-table="sec.account" table="sec.audit_log">
+	<columns names="acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_object_policy_grade_min_grade_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="RESTRICT" ref-table="sec.grade" table="meta.object_policy">
+	<columns names="min_grade_cd" ref-type="src-columns"/>
+	<columns names="grade_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_object_policy_category_ctgr_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="RESTRICT" ref-table="sec.category" table="meta.object_policy">
+	<columns names="ctgr_cd" ref-type="src-columns"/>
+	<columns names="ctgr_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_api_definition_account_owner_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="SET NULL" ref-table="sec.account" table="api.api_definition">
+	<columns names="owner_acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_api_grant_api_definition_api_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="api.api_definition" table="api.api_grant">
+	<columns names="api_id" ref-type="src-columns"/>
+	<columns names="api_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_api_grant_account_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="sec.account" table="api.api_grant">
+	<columns names="acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_api_grant_role_role_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="CASCADE" ref-table="sec.role" table="api.api_grant">
+	<columns names="role_cd" ref-type="src-columns"/>
+	<columns names="role_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_api_grant_account_grant_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="SET NULL" ref-table="sec.account" table="api.api_grant">
+	<columns names="grant_acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_action_policy_grade_min_grade_cd" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="RESTRICT" ref-table="sec.grade" table="api.action_policy">
+	<columns names="min_grade_cd" ref-type="src-columns"/>
+	<columns names="grade_cd" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_call_log_api_definition_api_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="SET NULL" ref-table="api.api_definition" table="api.call_log">
+	<columns names="api_id" ref-type="src-columns"/>
+	<columns names="api_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_call_log_account_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="SET NULL" ref-table="sec.account" table="api.call_log">
+	<columns names="acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_job_source_src_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="RESTRICT" ref-table="ingest.source" table="ingest.job">
+	<columns names="src_id" ref-type="src-columns"/>
+	<columns names="src_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_job_account_acct_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="SET NULL" ref-table="sec.account" table="ingest.job">
+	<columns names="acct_id" ref-type="src-columns"/>
+	<columns names="acct_id" ref-type="dst-columns"/>
+</constraint>
+<constraint name="fk_lake_dataset_source_src_id" type="fk-constr" comparison-type="MATCH SIMPLE" upd-action="NO ACTION" del-action="SET NULL" ref-table="ingest.source" table="ingest.lake_dataset">
+	<columns names="src_id" ref-type="src-columns"/>
+	<columns names="src_id" ref-type="dst-columns"/>
+</constraint>
+<relationship name="rel_account_grade_grade_cd" alias="계정→등급" type="relfk" layers="0" src-table="sec.account" dst-table="sec.grade" src-required="false" dst-required="false"/>
+<relationship name="rel_account_category_account_acct_id" alias="계정분류권한→계정" type="relfk" layers="0" src-table="sec.account_category" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_account_category_category_ctgr_cd" alias="계정분류권한→분류" type="relfk" layers="0" src-table="sec.account_category" dst-table="sec.category" src-required="false" dst-required="false"/>
+<relationship name="rel_account_key_account_acct_id" alias="계정키→계정" type="relfk" layers="0" src-table="sec.account_key" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_role_category_role_role_cd" alias="역할분류권한→역할" type="relfk" layers="0" src-table="sec.role_category" dst-table="sec.role" src-required="false" dst-required="false"/>
+<relationship name="rel_role_category_category_ctgr_cd" alias="역할분류권한→분류" type="relfk" layers="0" src-table="sec.role_category" dst-table="sec.category" src-required="false" dst-required="false"/>
+<relationship name="rel_role_member_role_role_cd" alias="역할멤버→역할" type="relfk" layers="0" src-table="sec.role_member" dst-table="sec.role" src-required="false" dst-required="false"/>
+<relationship name="rel_role_member_account_acct_id" alias="역할멤버→계정" type="relfk" layers="0" src-table="sec.role_member" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_audit_log_account_acct_id" alias="감사로그→계정" type="relfk" layers="0" src-table="sec.audit_log" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_object_policy_grade_min_grade_cd" alias="객체정책→등급" type="relfk" layers="0" src-table="meta.object_policy" dst-table="sec.grade" src-required="false" dst-required="false"/>
+<relationship name="rel_object_policy_category_ctgr_cd" alias="객체정책→분류" type="relfk" layers="0" src-table="meta.object_policy" dst-table="sec.category" src-required="false" dst-required="false"/>
+<relationship name="rel_api_definition_account_owner_acct_id" alias="API정의→계정" type="relfk" layers="0" src-table="api.api_definition" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_api_grant_api_definition_api_id" alias="API사용권한→API정의" type="relfk" layers="0" src-table="api.api_grant" dst-table="api.api_definition" src-required="false" dst-required="false"/>
+<relationship name="rel_api_grant_account_acct_id" alias="API사용권한→계정" type="relfk" layers="0" src-table="api.api_grant" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_api_grant_role_role_cd" alias="API사용권한→역할" type="relfk" layers="0" src-table="api.api_grant" dst-table="sec.role" src-required="false" dst-required="false"/>
+<relationship name="rel_api_grant_account_grant_acct_id" alias="API사용권한→계정" type="relfk" layers="0" src-table="api.api_grant" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_action_policy_grade_min_grade_cd" alias="행위정책→등급" type="relfk" layers="0" src-table="api.action_policy" dst-table="sec.grade" src-required="false" dst-required="false"/>
+<relationship name="rel_call_log_api_definition_api_id" alias="호출로그→API정의" type="relfk" layers="0" src-table="api.call_log" dst-table="api.api_definition" src-required="false" dst-required="false"/>
+<relationship name="rel_call_log_account_acct_id" alias="호출로그→계정" type="relfk" layers="0" src-table="api.call_log" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_job_source_src_id" alias="작업→원천" type="relfk" layers="0" src-table="ingest.job" dst-table="ingest.source" src-required="false" dst-required="false"/>
+<relationship name="rel_job_account_acct_id" alias="작업→계정" type="relfk" layers="0" src-table="ingest.job" dst-table="sec.account" src-required="false" dst-required="false"/>
+<relationship name="rel_lake_dataset_source_src_id" alias="레이크데이터셋→원천" type="relfk" layers="0" src-table="ingest.lake_dataset" dst-table="ingest.source" src-required="false" dst-required="false"/>
+</dbmodel>

@@ -1,0 +1,1266 @@
+{
+  "project": "학사관리(수강·성적·연락처) 입문 모델",
+  "version": "1.0",
+  "generated_at": "2026-10-01",
+  "db": "postgresql",
+  "db_version": "16",
+  "schema": "acad",
+  "meta_schema": "meta",
+  "modeling_tool": "pgModeler 1.1",
+  "assumptions": [
+    "한 학기 기준(학기 엔터티 없음)",
+    "분반 없음",
+    "과목당 담당 교수 1명",
+    "연락처는 현재값만 관리(이력 없음)",
+    "성적등급 9종 고정 → CHECK"
+  ],
+  "open_questions": [
+    "교수의 학과 소속 필요 여부",
+    "학생 상태(재학·휴학·졸업) 필요 여부",
+    "학기 구분 선반영 여부"
+  ],
+  "words": [
+    {
+      "kor": "학과",
+      "abbr": "dept",
+      "full": "department",
+      "is_class": false,
+      "desc": "학생이 소속되는 학사 조직"
+    },
+    {
+      "kor": "교수",
+      "abbr": "prof",
+      "full": "professor",
+      "is_class": false,
+      "desc": "과목을 담당하는 교원"
+    },
+    {
+      "kor": "학생",
+      "abbr": "stud",
+      "full": "student",
+      "is_class": false,
+      "desc": "재학 중인 학습자"
+    },
+    {
+      "kor": "과목",
+      "abbr": "course",
+      "full": "course",
+      "is_class": false,
+      "desc": "개설된 교과목"
+    },
+    {
+      "kor": "수강",
+      "abbr": "enroll",
+      "full": "enrollment",
+      "is_class": false,
+      "desc": "학생이 과목을 듣는 사실"
+    },
+    {
+      "kor": "성적",
+      "abbr": "grade",
+      "full": "grade",
+      "is_class": false,
+      "desc": "수강 결과 평가 등급"
+    },
+    {
+      "kor": "연락처",
+      "abbr": "contact",
+      "full": "contact",
+      "is_class": false,
+      "desc": "학생과 연결된 연락 수단"
+    },
+    {
+      "kor": "주체",
+      "abbr": "subject",
+      "full": "subject",
+      "is_class": false,
+      "desc": "연락처의 소유 주체(본인·보호자)"
+    },
+    {
+      "kor": "유형",
+      "abbr": "type",
+      "full": "type",
+      "is_class": false,
+      "desc": "분류 유형"
+    },
+    {
+      "kor": "비상",
+      "abbr": "emerg",
+      "full": "emergency",
+      "is_class": false,
+      "desc": "비상 연락망"
+    },
+    {
+      "kor": "값",
+      "abbr": "val",
+      "full": "value",
+      "is_class": false,
+      "desc": "실제 내용 값"
+    },
+    {
+      "kor": "학점",
+      "abbr": "credit",
+      "full": "credit",
+      "is_class": false,
+      "desc": "이수 학점"
+    },
+    {
+      "kor": "개인정보",
+      "abbr": "pi",
+      "full": "personal_information",
+      "is_class": false,
+      "desc": "개인 식별·민감 정보 테이블 접두어"
+    },
+    {
+      "kor": "코드표",
+      "abbr": "code",
+      "full": "code_table",
+      "is_class": false,
+      "desc": "코드 테이블 접미어(코드값 분류어 cd 와 구분)"
+    },
+    {
+      "kor": "생성",
+      "abbr": "created",
+      "full": "created",
+      "is_class": false,
+      "desc": "행 생성"
+    },
+    {
+      "kor": "수정",
+      "abbr": "updated",
+      "full": "updated",
+      "is_class": false,
+      "desc": "행 최종 수정"
+    },
+    {
+      "kor": "사용",
+      "abbr": "use",
+      "full": "use",
+      "is_class": false,
+      "desc": "사용 중 여부"
+    },
+    {
+      "kor": "순서",
+      "abbr": "sort",
+      "full": "sort",
+      "is_class": false,
+      "desc": "표시 순서"
+    },
+    {
+      "kor": "코드",
+      "abbr": "cd",
+      "full": "code",
+      "is_class": true,
+      "desc": "분류어: 코드값"
+    },
+    {
+      "kor": "번호",
+      "abbr": "no",
+      "full": "number",
+      "is_class": true,
+      "desc": "분류어: 업무 식별 번호"
+    },
+    {
+      "kor": "명",
+      "abbr": "nm",
+      "full": "name",
+      "is_class": true,
+      "desc": "분류어: 명칭"
+    },
+    {
+      "kor": "식별자",
+      "abbr": "id",
+      "full": "identifier",
+      "is_class": true,
+      "desc": "분류어: 시스템 대리키"
+    },
+    {
+      "kor": "여부",
+      "abbr": "yn",
+      "full": "yes_no",
+      "is_class": true,
+      "desc": "분류어: 참/거짓"
+    },
+    {
+      "kor": "시각",
+      "abbr": "at",
+      "full": "timestamp",
+      "is_class": true,
+      "desc": "분류어: 일시"
+    }
+  ],
+  "domains": [
+    {
+      "name": "식별자",
+      "type": "bigint",
+      "check": null,
+      "example": "1001",
+      "desc": "시스템 대리키"
+    },
+    {
+      "name": "코드(10)",
+      "type": "varchar(10)",
+      "check": null,
+      "example": "SELF",
+      "desc": "코드값"
+    },
+    {
+      "name": "성적등급",
+      "type": "varchar(2)",
+      "check": "IN ('A+','A0','B+','B0','C+','C0','D+','D0','F')",
+      "example": "A0",
+      "desc": "성적 등급 9종"
+    },
+    {
+      "name": "번호(10)",
+      "type": "varchar(10)",
+      "check": null,
+      "example": "S001",
+      "desc": "업무 식별 번호"
+    },
+    {
+      "name": "명칭(50)",
+      "type": "varchar(50)",
+      "check": null,
+      "example": "김민준",
+      "desc": "짧은 명칭"
+    },
+    {
+      "name": "명칭(100)",
+      "type": "varchar(100)",
+      "check": null,
+      "example": "컴퓨터공학과",
+      "desc": "긴 명칭"
+    },
+    {
+      "name": "연락처값",
+      "type": "varchar(200)",
+      "check": null,
+      "example": "010-1234-5678",
+      "desc": "전화·이메일·주소 등 실제 값"
+    },
+    {
+      "name": "학점",
+      "type": "smallint",
+      "check": "BETWEEN 0 AND 10",
+      "example": "3",
+      "desc": "이수 학점"
+    },
+    {
+      "name": "여부",
+      "type": "boolean",
+      "check": null,
+      "example": "true",
+      "desc": "참/거짓"
+    },
+    {
+      "name": "순서",
+      "type": "integer",
+      "check": null,
+      "example": "1",
+      "desc": "표시 순서"
+    },
+    {
+      "name": "시각",
+      "type": "timestamptz",
+      "check": null,
+      "example": "2026-03-01 09:00+09",
+      "desc": "일시(시간대 포함)"
+    }
+  ],
+  "terms": [
+    {
+      "kor": "연락처주체코드",
+      "phys": "contact_subject_code",
+      "word_path": "연락처>주체>코드",
+      "domain": null,
+      "desc": "연락처 주체 분류(본인·어머니·아버지·보호자·기타)"
+    },
+    {
+      "kor": "주체코드",
+      "phys": "subject_cd",
+      "word_path": "주체>코드",
+      "domain": "코드(10)",
+      "desc": null
+    },
+    {
+      "kor": "주체명",
+      "phys": "subject_nm",
+      "word_path": "주체>명",
+      "domain": "명칭(50)",
+      "desc": null
+    },
+    {
+      "kor": "순서번호",
+      "phys": "sort_no",
+      "word_path": "순서>번호",
+      "domain": "순서",
+      "desc": null
+    },
+    {
+      "kor": "사용여부",
+      "phys": "use_yn",
+      "word_path": "사용>여부",
+      "domain": "여부",
+      "desc": null
+    },
+    {
+      "kor": "생성시각",
+      "phys": "created_at",
+      "word_path": "생성>시각",
+      "domain": "시각",
+      "desc": null
+    },
+    {
+      "kor": "수정시각",
+      "phys": "updated_at",
+      "word_path": "수정>시각",
+      "domain": "시각",
+      "desc": null
+    },
+    {
+      "kor": "연락처유형코드",
+      "phys": "contact_type_code",
+      "word_path": "연락처>유형>코드",
+      "domain": null,
+      "desc": "연락처 유형 분류(휴대전화·집전화·이메일·주소)"
+    },
+    {
+      "kor": "유형코드",
+      "phys": "type_cd",
+      "word_path": "유형>코드",
+      "domain": "코드(10)",
+      "desc": null
+    },
+    {
+      "kor": "유형명",
+      "phys": "type_nm",
+      "word_path": "유형>명",
+      "domain": "명칭(50)",
+      "desc": null
+    },
+    {
+      "kor": "학과",
+      "phys": "department",
+      "word_path": "학과",
+      "domain": null,
+      "desc": "학생이 소속되는 학사 조직"
+    },
+    {
+      "kor": "학과식별자",
+      "phys": "dept_id",
+      "word_path": "학과>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "학과코드",
+      "phys": "dept_cd",
+      "word_path": "학과>코드",
+      "domain": "코드(10)",
+      "desc": "업무 자연키"
+    },
+    {
+      "kor": "학과명",
+      "phys": "dept_nm",
+      "word_path": "학과>명",
+      "domain": "명칭(100)",
+      "desc": null
+    },
+    {
+      "kor": "교수",
+      "phys": "professor",
+      "word_path": "교수",
+      "domain": null,
+      "desc": "과목을 담당하는 교원. 성명은 pi_professor"
+    },
+    {
+      "kor": "교수식별자",
+      "phys": "prof_id",
+      "word_path": "교수>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "교수번호",
+      "phys": "prof_no",
+      "word_path": "교수>번호",
+      "domain": "번호(10)",
+      "desc": "업무 자연키"
+    },
+    {
+      "kor": "교수개인정보",
+      "phys": "pi_professor",
+      "word_path": "개인정보>교수",
+      "domain": null,
+      "desc": "교수 성명 등 개인정보. professor 와 1:1"
+    },
+    {
+      "kor": "교수명",
+      "phys": "prof_nm",
+      "word_path": "교수>명",
+      "domain": "명칭(50)",
+      "desc": null
+    },
+    {
+      "kor": "학생",
+      "phys": "student",
+      "word_path": "학생",
+      "domain": null,
+      "desc": "재학생. 성명은 pi_student"
+    },
+    {
+      "kor": "학생식별자",
+      "phys": "stud_id",
+      "word_path": "학생>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "학생번호",
+      "phys": "stud_no",
+      "word_path": "학생>번호",
+      "domain": "번호(10)",
+      "desc": "업무 자연키"
+    },
+    {
+      "kor": "학생개인정보",
+      "phys": "pi_student",
+      "word_path": "개인정보>학생",
+      "domain": null,
+      "desc": "학생 성명 등 개인정보. student 와 1:1"
+    },
+    {
+      "kor": "학생명",
+      "phys": "stud_nm",
+      "word_path": "학생>명",
+      "domain": "명칭(50)",
+      "desc": null
+    },
+    {
+      "kor": "과목",
+      "phys": "course",
+      "word_path": "과목",
+      "domain": null,
+      "desc": "개설 과목. 이수학점과 담당 교수 1명"
+    },
+    {
+      "kor": "과목식별자",
+      "phys": "course_id",
+      "word_path": "과목>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "과목코드",
+      "phys": "course_cd",
+      "word_path": "과목>코드",
+      "domain": "코드(10)",
+      "desc": "업무 자연키"
+    },
+    {
+      "kor": "과목명",
+      "phys": "course_nm",
+      "word_path": "과목>명",
+      "domain": "명칭(100)",
+      "desc": null
+    },
+    {
+      "kor": "학점",
+      "phys": "credit",
+      "word_path": "학점",
+      "domain": "학점",
+      "desc": null
+    },
+    {
+      "kor": "수강성적",
+      "phys": "enrollment",
+      "word_path": "수강",
+      "domain": null,
+      "desc": "학생×과목 교차. 성적등급은 이 관계의 속성. PK=(학생,과목)이 중복 수강을 막음"
+    },
+    {
+      "kor": "성적등급코드",
+      "phys": "grade_cd",
+      "word_path": "성적>코드",
+      "domain": "성적등급",
+      "desc": "미확정이면 NULL"
+    },
+    {
+      "kor": "연락처",
+      "phys": "contact",
+      "word_path": "연락처",
+      "domain": null,
+      "desc": "학생 1명에 여러 개. 주체·유형·비상여부. 실제 값은 pi_contact"
+    },
+    {
+      "kor": "연락처식별자",
+      "phys": "contact_id",
+      "word_path": "연락처>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "비상여부",
+      "phys": "emerg_yn",
+      "word_path": "비상>여부",
+      "domain": "여부",
+      "desc": null
+    },
+    {
+      "kor": "연락처개인정보",
+      "phys": "pi_contact",
+      "word_path": "개인정보>연락처",
+      "domain": null,
+      "desc": "전화번호·주소 등 연락처 실제 값. contact 와 1:1"
+    },
+    {
+      "kor": "연락처값",
+      "phys": "contact_val",
+      "word_path": "연락처>값",
+      "domain": "연락처값",
+      "desc": null
+    }
+  ],
+  "tables": [
+    {
+      "name": "contact_subject_code",
+      "kor": "연락처주체코드",
+      "kind": "코드",
+      "is_pi": false,
+      "description": "연락처 주체 분류(본인·어머니·아버지·보호자·기타)",
+      "columns": [
+        {
+          "name": "subject_cd",
+          "kor": "주체코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "pk": true
+        },
+        {
+          "name": "subject_nm",
+          "kor": "주체명",
+          "domain": "명칭(50)",
+          "nullable": false
+        },
+        {
+          "name": "sort_no",
+          "kor": "순서번호",
+          "domain": "순서",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "seed": [
+        [
+          "SELF",
+          "본인",
+          1
+        ],
+        [
+          "MOTHER",
+          "어머니",
+          2
+        ],
+        [
+          "FATHER",
+          "아버지",
+          3
+        ],
+        [
+          "GUARDIAN",
+          "보호자",
+          4
+        ],
+        [
+          "ETC",
+          "기타",
+          9
+        ]
+      ]
+    },
+    {
+      "name": "contact_type_code",
+      "kor": "연락처유형코드",
+      "kind": "코드",
+      "is_pi": false,
+      "description": "연락처 유형 분류(휴대전화·집전화·이메일·주소)",
+      "columns": [
+        {
+          "name": "type_cd",
+          "kor": "유형코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "pk": true
+        },
+        {
+          "name": "type_nm",
+          "kor": "유형명",
+          "domain": "명칭(50)",
+          "nullable": false
+        },
+        {
+          "name": "sort_no",
+          "kor": "순서번호",
+          "domain": "순서",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "seed": [
+        [
+          "MOBILE",
+          "휴대전화",
+          1
+        ],
+        [
+          "HOME",
+          "집전화",
+          2
+        ],
+        [
+          "EMAIL",
+          "이메일",
+          3
+        ],
+        [
+          "ADDR",
+          "주소",
+          4
+        ]
+      ]
+    },
+    {
+      "name": "department",
+      "kor": "학과",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "학생이 소속되는 학사 조직",
+      "columns": [
+        {
+          "name": "dept_id",
+          "kor": "학과식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "dept_cd",
+          "kor": "학과코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "unique": true,
+          "description": "업무 자연키"
+        },
+        {
+          "name": "dept_nm",
+          "kor": "학과명",
+          "domain": "명칭(100)",
+          "nullable": false
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "professor",
+      "kor": "교수",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "과목을 담당하는 교원. 성명은 pi_professor",
+      "columns": [
+        {
+          "name": "prof_id",
+          "kor": "교수식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "prof_no",
+          "kor": "교수번호",
+          "domain": "번호(10)",
+          "nullable": false,
+          "unique": true,
+          "description": "업무 자연키"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "pi_professor",
+      "kor": "교수개인정보",
+      "kind": "PI",
+      "is_pi": true,
+      "description": "교수 성명 등 개인정보. professor 와 1:1",
+      "columns": [
+        {
+          "name": "prof_id",
+          "kor": "교수식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "professor",
+            "column": "prof_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "prof_nm",
+          "kor": "교수명",
+          "domain": "명칭(50)",
+          "nullable": false,
+          "pi": true,
+          "pi_type": "성명"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "student",
+      "kor": "학생",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "재학생. 성명은 pi_student",
+      "columns": [
+        {
+          "name": "stud_id",
+          "kor": "학생식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "stud_no",
+          "kor": "학생번호",
+          "domain": "번호(10)",
+          "nullable": false,
+          "unique": true,
+          "description": "업무 자연키"
+        },
+        {
+          "name": "dept_id",
+          "kor": "학과식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "fk": {
+            "table": "department",
+            "column": "dept_id",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "pi_student",
+      "kor": "학생개인정보",
+      "kind": "PI",
+      "is_pi": true,
+      "description": "학생 성명 등 개인정보. student 와 1:1",
+      "columns": [
+        {
+          "name": "stud_id",
+          "kor": "학생식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "student",
+            "column": "stud_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "stud_nm",
+          "kor": "학생명",
+          "domain": "명칭(50)",
+          "nullable": false,
+          "pi": true,
+          "pi_type": "성명"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "course",
+      "kor": "과목",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "개설 과목. 이수학점과 담당 교수 1명",
+      "columns": [
+        {
+          "name": "course_id",
+          "kor": "과목식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "course_cd",
+          "kor": "과목코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "unique": true,
+          "description": "업무 자연키"
+        },
+        {
+          "name": "course_nm",
+          "kor": "과목명",
+          "domain": "명칭(100)",
+          "nullable": false
+        },
+        {
+          "name": "credit",
+          "kor": "학점",
+          "domain": "학점",
+          "nullable": false
+        },
+        {
+          "name": "prof_id",
+          "kor": "교수식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "fk": {
+            "table": "professor",
+            "column": "prof_id",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "enrollment",
+      "kor": "수강성적",
+      "kind": "거래",
+      "is_pi": false,
+      "description": "학생×과목 교차. 성적등급은 이 관계의 속성. PK=(학생,과목)이 중복 수강을 막음",
+      "columns": [
+        {
+          "name": "stud_id",
+          "kor": "학생식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "student",
+            "column": "stud_id",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "course_id",
+          "kor": "과목식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "course",
+            "column": "course_id",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "grade_cd",
+          "kor": "성적등급코드",
+          "domain": "성적등급",
+          "nullable": true,
+          "description": "미확정이면 NULL"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "contact",
+      "kor": "연락처",
+      "kind": "거래",
+      "is_pi": false,
+      "description": "학생 1명에 여러 개. 주체·유형·비상여부. 실제 값은 pi_contact",
+      "columns": [
+        {
+          "name": "contact_id",
+          "kor": "연락처식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "stud_id",
+          "kor": "학생식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "fk": {
+            "table": "student",
+            "column": "stud_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "subject_cd",
+          "kor": "주체코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "fk": {
+            "table": "contact_subject_code",
+            "column": "subject_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "type_cd",
+          "kor": "유형코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "fk": {
+            "table": "contact_type_code",
+            "column": "type_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "emerg_yn",
+          "kor": "비상여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "pi_contact",
+      "kor": "연락처개인정보",
+      "kind": "PI",
+      "is_pi": true,
+      "description": "전화번호·주소 등 연락처 실제 값. contact 와 1:1",
+      "columns": [
+        {
+          "name": "contact_id",
+          "kor": "연락처식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "contact",
+            "column": "contact_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "contact_val",
+          "kor": "연락처값",
+          "domain": "연락처값",
+          "nullable": false,
+          "pi": true,
+          "pi_type": "연락처(전화·이메일·주소)",
+          "sensitive": true
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from": "pi_professor",
+      "from_col": "prof_id",
+      "to": "professor",
+      "to_col": "prof_id",
+      "type": "1:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "교수개인정보.교수식별자 → professor"
+    },
+    {
+      "from": "student",
+      "from_col": "dept_id",
+      "to": "department",
+      "to_col": "dept_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "학생.학과식별자 → department"
+    },
+    {
+      "from": "pi_student",
+      "from_col": "stud_id",
+      "to": "student",
+      "to_col": "stud_id",
+      "type": "1:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "학생개인정보.학생식별자 → student"
+    },
+    {
+      "from": "course",
+      "from_col": "prof_id",
+      "to": "professor",
+      "to_col": "prof_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "과목.교수식별자 → professor"
+    },
+    {
+      "from": "enrollment",
+      "from_col": "stud_id",
+      "to": "student",
+      "to_col": "stud_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "수강성적.학생식별자 → student"
+    },
+    {
+      "from": "enrollment",
+      "from_col": "course_id",
+      "to": "course",
+      "to_col": "course_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "수강성적.과목식별자 → course"
+    },
+    {
+      "from": "contact",
+      "from_col": "stud_id",
+      "to": "student",
+      "to_col": "stud_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "연락처.학생식별자 → student"
+    },
+    {
+      "from": "contact",
+      "from_col": "subject_cd",
+      "to": "contact_subject_code",
+      "to_col": "subject_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "연락처.주체코드 → contact_subject_code"
+    },
+    {
+      "from": "contact",
+      "from_col": "type_cd",
+      "to": "contact_type_code",
+      "to_col": "type_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "연락처.유형코드 → contact_type_code"
+    },
+    {
+      "from": "pi_contact",
+      "from_col": "contact_id",
+      "to": "contact",
+      "to_col": "contact_id",
+      "type": "1:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "연락처개인정보.연락처식별자 → contact"
+    }
+  ],
+  "pi_suggestions": [
+    "pi_* 테이블을 별도 스키마(pi)로 옮기고 전용 ROLE에만 SELECT 부여",
+    "pi_contact.contact_val, pi_student.stud_nm 에 pgcrypto(pgp_sym_encrypt) 컬럼 암호화 적용 검토",
+    "일반 조회용 마스킹 뷰(v_student_masked: 김*준, 010-****-2222) 제공",
+    "졸업·탈퇴 후 보존 기간(예: 5년) 경과 시 pi_* 파기 배치",
+    "행 수준 보안(RLS)으로 담당 학과 외 접근 차단"
+  ],
+  "dq_notes": [
+    "모든 테이블 PK 보유, 업무 자연키(학과코드·교수번호·학생번호·과목코드) UNIQUE",
+    "enrollment PK=(stud_id, course_id)로 같은 과목 중복 수강 행 차단",
+    "성적등급 CHECK 9종, 학점 CHECK 0~10",
+    "모든 FK 삭제규칙 명시: 기준 참조는 RESTRICT, 종속(학생→연락처, 본체→PI)은 CASCADE",
+    "FK 컬럼마다 인덱스",
+    "시각은 timestamptz, 이름·코드는 varchar 길이 제한"
+  ],
+  "denormalization_notes": [
+    "없음 — 3NF 유지. 향후 '이수 당시 학점' 보존 요구 시 enrollment.credit 스냅샷 컬럼 추가(이유 기록)"
+  ],
+  "change_scenarios": [
+    "여러 학기 → enrollment PK에 term_cd 추가",
+    "분반·공동강의 → course_professor 교차 엔터티",
+    "보호자 관리 → guardian 엔터티"
+  ]
+}

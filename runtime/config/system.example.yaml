@@ -1,0 +1,45 @@
+# data-platform 시스템 설정 파일 예시
+# 복사해서 system.yaml 로 저장하고 값을 채운다:  python -m dataplatform keygen --write config/system.yaml
+# ⚠ 이 파일에는 암호화 키가 들어간다 — 권한 600, 저장소(git)에 올리지 말 것.
+
+database:
+  # 플랫폼 서비스 계정(테이블 소유자). 계정별 DB 롤을 만들고 SET ROLE 하려면 superuser 또는 CREATEROLE 권한 필요
+  dsn: "postgresql://postgres:CHANGE_ME@localhost:5432/appdb"
+
+crypto:
+  # 128비트(16바이트) 키 = 16진수 32자리. 키 교체 시 번호를 추가하고 active_key 를 바꾼 뒤 `rotate-keys` 실행
+  active_key: 1
+  keys:
+    1: ""            # 양방향(AES-128-GCM) 암호화 키
+  hmac_key: ""       # 단방향(HMAC-SHA256) 검색·API키·파라미터 해시용 키 (128비트)
+
+glossary:
+  mode: auto                     # auto | bomiyang | meta
+  bomiyang_path: "./bomiyang-glossary"   # https://github.com/sungbeom78/bomiyang-glossary 클론 경로
+  # auto: bomiyang_path 에 dictionary/words.json 이 있으면 bomiyang, 없으면 DB meta 스키마 용어 테이블
+
+access:
+  # 권한 동기화(sync)가 손대는 스키마. 플랫폼 스키마(meta·sec·api·ingest·pi), 플랫폼으로 만든 스키마
+  # (meta.table_catalog 등록분), 접근정책이 걸린 스키마는 자동 포함. 그 밖의 스키마(다른 앱)는 GRANT/REVOKE 하지 않는다.
+  # 플랫폼 전용 DB 라서 모든 스키마를 관리하려면 "*"
+  managed_schemas: []            # 예: [pub, acad]
+  # 정책이 없는 (관리 대상) 스키마/테이블은 전체 허용. 아래 스키마는 어떤 경우에도 제외
+  exclude_schemas: [pg_catalog, information_schema, pg_toast]
+
+api:
+  jwt_secret: ""                 # 비우면 keygen 이 채움
+  token_ttl_min: 60
+  default_max_rows: 10000
+  default_timeout_ms: 15000
+  host: "0.0.0.0"
+  port: 8800
+
+ingest:
+  work_dir: "./work/ingest"      # 다운로드·임시 파일
+  lake_dir: "./data_lake"        # Parquet 저장 위치 (로그성·대용량)
+  large_rows: 10000000           # 이 행 수 이상이면 레이크 저장 제안
+  large_bytes: 2147483648        # 2GB 이상이면 레이크 저장 제안
+  lake_pi_policy: hmac           # 레이크 저장 시 개인정보 컬럼: hmac(검색용 해시만) | drop(제외)
+
+public_data:
+  service_key: ""                # 공공데이터포털(data.go.kr) Open API 인증키(일반 인증키, Decoding)

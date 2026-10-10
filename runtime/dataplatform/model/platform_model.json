@@ -1,0 +1,2883 @@
+{
+  "project": "data-platform 공통 스키마",
+  "version": "2.0",
+  "generated_at": "2026-10-10",
+  "db": "postgresql",
+  "db_version": "16",
+  "schema": "sec",
+  "meta_schema": "meta",
+  "meta_mode": "shared",
+  "pi_schema": "pi",
+  "modeling_tool": "pgModeler 1.1",
+  "assumptions": [
+    "정책 없는 객체는 전체 허용",
+    "계정은 등급 1개·분류 N개",
+    "API 사용은 명시적 부여 필요",
+    "API 실행은 호출 계정의 DB 롤로(SET ROLE) — DB 가 최종 권한 판정"
+  ],
+  "open_questions": [
+    "등급 추가 시 rank 간격(10) 유지 여부"
+  ],
+  "words": [
+    {
+      "kor": "계정",
+      "abbr": "acct",
+      "full": "account",
+      "is_class": false,
+      "desc": "플랫폼 사용 주체(개인·팀·시스템)"
+    },
+    {
+      "kor": "등급",
+      "abbr": "grade",
+      "full": "grade",
+      "is_class": false,
+      "desc": "접근 등급 s>a>b>c>d>e"
+    },
+    {
+      "kor": "분류",
+      "abbr": "ctgr",
+      "full": "category",
+      "is_class": false,
+      "desc": "데이터 분류(개인정보·매출·성적·인사·총무·시스템…)"
+    },
+    {
+      "kor": "역할",
+      "abbr": "role",
+      "full": "role",
+      "is_class": false,
+      "desc": "분류·API 권한 묶음"
+    },
+    {
+      "kor": "멤버",
+      "abbr": "member",
+      "full": "member",
+      "is_class": false,
+      "desc": "역할 구성원"
+    },
+    {
+      "kor": "키",
+      "abbr": "key",
+      "full": "key",
+      "is_class": false,
+      "desc": "인증 키"
+    },
+    {
+      "kor": "접두",
+      "abbr": "prefix",
+      "full": "prefix",
+      "is_class": false,
+      "desc": "식별용 앞부분"
+    },
+    {
+      "kor": "만료",
+      "abbr": "expire",
+      "full": "expire",
+      "is_class": false,
+      "desc": "효력 종료"
+    },
+    {
+      "kor": "감사",
+      "abbr": "audit",
+      "full": "audit",
+      "is_class": false,
+      "desc": "변경 추적"
+    },
+    {
+      "kor": "로그",
+      "abbr": "log",
+      "full": "log",
+      "is_class": false,
+      "desc": "기록"
+    },
+    {
+      "kor": "행위",
+      "abbr": "act",
+      "full": "action",
+      "is_class": false,
+      "desc": "수행 동작"
+    },
+    {
+      "kor": "대상",
+      "abbr": "target",
+      "full": "target",
+      "is_class": false,
+      "desc": "작업 대상"
+    },
+    {
+      "kor": "상세",
+      "abbr": "dtl",
+      "full": "detail",
+      "is_class": false,
+      "desc": "세부 내용"
+    },
+    {
+      "kor": "객체",
+      "abbr": "obj",
+      "full": "object",
+      "is_class": false,
+      "desc": "DB 객체"
+    },
+    {
+      "kor": "정책",
+      "abbr": "plcy",
+      "full": "policy",
+      "is_class": false,
+      "desc": "규칙 묶음"
+    },
+    {
+      "kor": "최소",
+      "abbr": "min",
+      "full": "minimum",
+      "is_class": false,
+      "desc": "하한"
+    },
+    {
+      "kor": "최대",
+      "abbr": "max",
+      "full": "maximum",
+      "is_class": false,
+      "desc": "상한"
+    },
+    {
+      "kor": "스키마",
+      "abbr": "schema",
+      "full": "schema",
+      "is_class": false,
+      "desc": "DB 스키마"
+    },
+    {
+      "kor": "테이블",
+      "abbr": "table",
+      "full": "table",
+      "is_class": false,
+      "desc": "DB 테이블"
+    },
+    {
+      "kor": "API",
+      "abbr": "api",
+      "full": "api",
+      "is_class": false,
+      "desc": "조회용 API"
+    },
+    {
+      "kor": "정의",
+      "abbr": "def",
+      "full": "definition",
+      "is_class": false,
+      "desc": "정의 내용"
+    },
+    {
+      "kor": "SQL",
+      "abbr": "sql",
+      "full": "sql",
+      "is_class": false,
+      "desc": "SQL 문"
+    },
+    {
+      "kor": "파라미터",
+      "abbr": "param",
+      "full": "parameter",
+      "is_class": false,
+      "desc": "호출 인자"
+    },
+    {
+      "kor": "행",
+      "abbr": "row",
+      "full": "row",
+      "is_class": false,
+      "desc": "레코드"
+    },
+    {
+      "kor": "제한시간",
+      "abbr": "timeout",
+      "full": "timeout",
+      "is_class": false,
+      "desc": "실행 시간 상한"
+    },
+    {
+      "kor": "부여",
+      "abbr": "grant",
+      "full": "grant",
+      "is_class": false,
+      "desc": "권한 부여"
+    },
+    {
+      "kor": "호출",
+      "abbr": "call",
+      "full": "call",
+      "is_class": false,
+      "desc": "API 호출"
+    },
+    {
+      "kor": "결과",
+      "abbr": "result",
+      "full": "result",
+      "is_class": false,
+      "desc": "처리 결과"
+    },
+    {
+      "kor": "경과",
+      "abbr": "elapsed",
+      "full": "elapsed",
+      "is_class": false,
+      "desc": "소요"
+    },
+    {
+      "kor": "소유",
+      "abbr": "owner",
+      "full": "owner",
+      "is_class": false,
+      "desc": "소유자"
+    },
+    {
+      "kor": "원천",
+      "abbr": "src",
+      "full": "source",
+      "is_class": false,
+      "desc": "데이터 출처"
+    },
+    {
+      "kor": "제공",
+      "abbr": "provider",
+      "full": "provider",
+      "is_class": false,
+      "desc": "제공 기관"
+    },
+    {
+      "kor": "라이선스",
+      "abbr": "license",
+      "full": "license",
+      "is_class": false,
+      "desc": "이용 허락 조건"
+    },
+    {
+      "kor": "URL",
+      "abbr": "url",
+      "full": "url",
+      "is_class": false,
+      "desc": "위치 주소"
+    },
+    {
+      "kor": "작업",
+      "abbr": "job",
+      "full": "job",
+      "is_class": false,
+      "desc": "적재 작업"
+    },
+    {
+      "kor": "상태",
+      "abbr": "status",
+      "full": "status",
+      "is_class": false,
+      "desc": "진행 상태"
+    },
+    {
+      "kor": "메시지",
+      "abbr": "msg",
+      "full": "message",
+      "is_class": false,
+      "desc": "안내·오류 문구"
+    },
+    {
+      "kor": "시작",
+      "abbr": "start",
+      "full": "start",
+      "is_class": false,
+      "desc": "시작"
+    },
+    {
+      "kor": "종료",
+      "abbr": "end",
+      "full": "end",
+      "is_class": false,
+      "desc": "종료"
+    },
+    {
+      "kor": "바이트",
+      "abbr": "byte",
+      "full": "byte",
+      "is_class": false,
+      "desc": "크기 단위"
+    },
+    {
+      "kor": "데이터셋",
+      "abbr": "dataset",
+      "full": "dataset",
+      "is_class": false,
+      "desc": "레이크 저장 데이터 묶음"
+    },
+    {
+      "kor": "경로",
+      "abbr": "path",
+      "full": "path",
+      "is_class": false,
+      "desc": "파일 경로"
+    },
+    {
+      "kor": "파티션",
+      "abbr": "partition",
+      "full": "partition",
+      "is_class": false,
+      "desc": "분할 기준"
+    },
+    {
+      "kor": "컬럼",
+      "abbr": "col",
+      "full": "column",
+      "is_class": false,
+      "desc": "DB 컬럼"
+    },
+    {
+      "kor": "파일",
+      "abbr": "file",
+      "full": "file",
+      "is_class": false,
+      "desc": "파일"
+    },
+    {
+      "kor": "형식",
+      "abbr": "fmt",
+      "full": "format",
+      "is_class": false,
+      "desc": "파일 형식"
+    },
+    {
+      "kor": "저장",
+      "abbr": "store",
+      "full": "store",
+      "is_class": false,
+      "desc": "저장 방식"
+    },
+    {
+      "kor": "프로파일",
+      "abbr": "profile",
+      "full": "profile",
+      "is_class": false,
+      "desc": "데이터 프로파일링 결과"
+    },
+    {
+      "kor": "레이크",
+      "abbr": "lake",
+      "full": "lake",
+      "is_class": false,
+      "desc": "디스크 기반 대용량 저장소"
+    },
+    {
+      "kor": "비밀번호",
+      "abbr": "pwd",
+      "full": "password",
+      "is_class": false,
+      "desc": "로그인 비밀번호"
+    },
+    {
+      "kor": "관리자",
+      "abbr": "admin",
+      "full": "admin",
+      "is_class": false,
+      "desc": "관리 권한"
+    },
+    {
+      "kor": "로그인",
+      "abbr": "login",
+      "full": "login",
+      "is_class": false,
+      "desc": "인증"
+    },
+    {
+      "kor": "순위",
+      "abbr": "rank",
+      "full": "rank",
+      "is_class": false,
+      "desc": "높을수록 상위"
+    },
+    {
+      "kor": "설명",
+      "abbr": "desc",
+      "full": "description",
+      "is_class": false,
+      "desc": "설명 문구(단독 사용 금지 — 예약어)"
+    },
+    {
+      "kor": "생성",
+      "abbr": "created",
+      "full": "created",
+      "is_class": false,
+      "desc": "행 생성"
+    },
+    {
+      "kor": "수정",
+      "abbr": "updated",
+      "full": "updated",
+      "is_class": false,
+      "desc": "행 최종 수정"
+    },
+    {
+      "kor": "사용",
+      "abbr": "use",
+      "full": "use",
+      "is_class": false,
+      "desc": "사용 중 여부"
+    },
+    {
+      "kor": "순서",
+      "abbr": "sort",
+      "full": "sort",
+      "is_class": false,
+      "desc": "표시 순서"
+    },
+    {
+      "kor": "값",
+      "abbr": "val",
+      "full": "value",
+      "is_class": false,
+      "desc": "실제 내용 값"
+    },
+    {
+      "kor": "유형",
+      "abbr": "type",
+      "full": "type",
+      "is_class": false,
+      "desc": "분류 유형"
+    },
+    {
+      "kor": "승인",
+      "abbr": "aprv",
+      "full": "approval",
+      "is_class": false,
+      "desc": "사용자 승인 근거(인용·승인자·대상)"
+    },
+    {
+      "kor": "코드",
+      "abbr": "cd",
+      "full": "code",
+      "is_class": true,
+      "desc": "분류어: 코드값"
+    },
+    {
+      "kor": "번호",
+      "abbr": "no",
+      "full": "number",
+      "is_class": true,
+      "desc": "분류어: 업무 식별 번호"
+    },
+    {
+      "kor": "명",
+      "abbr": "nm",
+      "full": "name",
+      "is_class": true,
+      "desc": "분류어: 명칭"
+    },
+    {
+      "kor": "식별자",
+      "abbr": "id",
+      "full": "identifier",
+      "is_class": true,
+      "desc": "분류어: 시스템 대리키"
+    },
+    {
+      "kor": "여부",
+      "abbr": "yn",
+      "full": "yes_no",
+      "is_class": true,
+      "desc": "분류어: 참/거짓"
+    },
+    {
+      "kor": "시각",
+      "abbr": "at",
+      "full": "timestamp",
+      "is_class": true,
+      "desc": "분류어: 일시"
+    },
+    {
+      "kor": "수",
+      "abbr": "cnt",
+      "full": "count",
+      "is_class": true,
+      "desc": "분류어: 건수"
+    },
+    {
+      "kor": "해시",
+      "abbr": "hash",
+      "full": "hash",
+      "is_class": true,
+      "desc": "분류어: 단방향 해시값"
+    },
+    {
+      "kor": "밀리초",
+      "abbr": "ms",
+      "full": "millisecond",
+      "is_class": true,
+      "desc": "분류어: 시간(ms)"
+    }
+  ],
+  "domains": [
+    {
+      "name": "식별자",
+      "type": "bigint",
+      "check": null,
+      "example": "1001",
+      "desc": "시스템 대리키"
+    },
+    {
+      "name": "코드(10)",
+      "type": "varchar(10)",
+      "check": null,
+      "example": "SYS",
+      "desc": "짧은 코드값"
+    },
+    {
+      "name": "코드(30)",
+      "type": "varchar(30)",
+      "check": null,
+      "example": "DATA_ANALYST",
+      "desc": "긴 코드값"
+    },
+    {
+      "name": "명칭(100)",
+      "type": "varchar(100)",
+      "check": null,
+      "example": "데이터분석팀",
+      "desc": "명칭"
+    },
+    {
+      "name": "명칭(200)",
+      "type": "varchar(200)",
+      "check": null,
+      "example": "전국 어린이집 표준데이터",
+      "desc": "긴 명칭"
+    },
+    {
+      "name": "물리명",
+      "type": "varchar(63)",
+      "check": null,
+      "example": "student",
+      "desc": "PostgreSQL 식별자(63자)"
+    },
+    {
+      "name": "API명",
+      "type": "varchar(63)",
+      "check": "~ '^[a-z][a-z0-9_]{1,62}$'",
+      "example": "sales_daily",
+      "desc": "API 경로명(소문자·숫자·_)"
+    },
+    {
+      "name": "로그인ID",
+      "type": "varchar(50)",
+      "check": "~ '^[a-z][a-z0-9_.-]{2,49}$'",
+      "example": "team_bi",
+      "desc": "로그인 아이디"
+    },
+    {
+      "name": "계정유형",
+      "type": "varchar(10)",
+      "check": "IN ('USER','TEAM','SYSTEM')",
+      "example": "TEAM",
+      "desc": "개인·팀·시스템 계정"
+    },
+    {
+      "name": "원천유형",
+      "type": "varchar(10)",
+      "check": "IN ('FILE','URL','API','PUBLIC')",
+      "example": "PUBLIC",
+      "desc": "데이터 출처 유형"
+    },
+    {
+      "name": "저장유형",
+      "type": "varchar(10)",
+      "check": "IN ('DB','LAKE')",
+      "example": "DB",
+      "desc": "DB 테이블 / 디스크(Parquet) 저장"
+    },
+    {
+      "name": "작업상태",
+      "type": "varchar(10)",
+      "check": "IN ('READY','RUNNING','DONE','FAIL')",
+      "example": "DONE",
+      "desc": "적재 작업 상태"
+    },
+    {
+      "name": "등급순위",
+      "type": "smallint",
+      "check": "BETWEEN 0 AND 1000",
+      "example": "90",
+      "desc": "등급 순위(클수록 상위)"
+    },
+    {
+      "name": "여부",
+      "type": "boolean",
+      "check": null,
+      "example": "true",
+      "desc": "참/거짓"
+    },
+    {
+      "name": "순서",
+      "type": "integer",
+      "check": null,
+      "example": "1",
+      "desc": "표시 순서"
+    },
+    {
+      "name": "건수",
+      "type": "bigint",
+      "check": ">= 0",
+      "example": "10000",
+      "desc": "0 이상 건수·크기"
+    },
+    {
+      "name": "밀리초",
+      "type": "integer",
+      "check": "BETWEEN 100 AND 600000",
+      "example": "15000",
+      "desc": "실행 제한시간(ms)"
+    },
+    {
+      "name": "경과밀리초",
+      "type": "integer",
+      "check": ">= 0",
+      "example": "35",
+      "desc": "소요 시간(ms)"
+    },
+    {
+      "name": "시각",
+      "type": "timestamptz",
+      "check": null,
+      "example": "2026-10-05 21:00+09",
+      "desc": "일시(시간대 포함)"
+    },
+    {
+      "name": "설명",
+      "type": "text",
+      "check": null,
+      "example": "…",
+      "desc": "자유 설명"
+    },
+    {
+      "name": "SQL문",
+      "type": "text",
+      "check": null,
+      "example": "SELECT …",
+      "desc": "등록 SQL (SELECT 단일문)"
+    },
+    {
+      "name": "JSON",
+      "type": "jsonb",
+      "check": null,
+      "example": "[]",
+      "desc": "구조화 값"
+    },
+    {
+      "name": "URL",
+      "type": "text",
+      "check": null,
+      "example": "https://www.data.go.kr/…",
+      "desc": "주소·경로"
+    },
+    {
+      "name": "해시문",
+      "type": "text",
+      "check": null,
+      "example": "$argon2id$…",
+      "desc": "argon2id 해시 문자열(단방향)"
+    },
+    {
+      "name": "해시값",
+      "type": "bytea",
+      "check": null,
+      "example": "\\x…",
+      "desc": "HMAC-SHA256 32바이트(단방향)"
+    },
+    {
+      "name": "키접두",
+      "type": "varchar(12)",
+      "check": null,
+      "example": "dpk_ab12cd",
+      "desc": "API 키 앞부분(식별용·비밀 아님)"
+    }
+  ],
+  "terms": [
+    {
+      "kor": "등급",
+      "phys": "grade",
+      "word_path": "등급",
+      "domain": null,
+      "desc": "접근 등급. rank 가 클수록 상위(s=100). 계정은 등급 하나"
+    },
+    {
+      "kor": "등급코드",
+      "phys": "grade_cd",
+      "word_path": "등급>코드",
+      "domain": "코드(10)",
+      "desc": null
+    },
+    {
+      "kor": "등급명",
+      "phys": "grade_nm",
+      "word_path": "등급>명",
+      "domain": "명칭(100)",
+      "desc": null
+    },
+    {
+      "kor": "등급순위",
+      "phys": "grade_rank",
+      "word_path": "등급>순위",
+      "domain": "등급순위",
+      "desc": null
+    },
+    {
+      "kor": "사용여부",
+      "phys": "use_yn",
+      "word_path": "사용>여부",
+      "domain": "여부",
+      "desc": null
+    },
+    {
+      "kor": "생성시각",
+      "phys": "created_at",
+      "word_path": "생성>시각",
+      "domain": "시각",
+      "desc": null
+    },
+    {
+      "kor": "수정시각",
+      "phys": "updated_at",
+      "word_path": "수정>시각",
+      "domain": "시각",
+      "desc": null
+    },
+    {
+      "kor": "분류",
+      "phys": "category",
+      "word_path": "분류",
+      "domain": null,
+      "desc": "데이터 분류. 계정은 여러 분류 권한을 가질 수 있음"
+    },
+    {
+      "kor": "분류코드",
+      "phys": "ctgr_cd",
+      "word_path": "분류>코드",
+      "domain": "코드(10)",
+      "desc": null
+    },
+    {
+      "kor": "분류명",
+      "phys": "ctgr_nm",
+      "word_path": "분류>명",
+      "domain": "명칭(100)",
+      "desc": null
+    },
+    {
+      "kor": "순서번호",
+      "phys": "sort_no",
+      "word_path": "순서>번호",
+      "domain": "순서",
+      "desc": null
+    },
+    {
+      "kor": "계정",
+      "phys": "account",
+      "word_path": "계정",
+      "domain": null,
+      "desc": "개인·팀·시스템 계정. 등급 1개 + 관리자 여부. 비밀번호는 argon2id 단방향"
+    },
+    {
+      "kor": "계정식별자",
+      "phys": "acct_id",
+      "word_path": "계정>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "로그인식별자",
+      "phys": "login_id",
+      "word_path": "로그인>식별자",
+      "domain": "로그인ID",
+      "desc": "업무 자연키"
+    },
+    {
+      "kor": "계정명",
+      "phys": "acct_nm",
+      "word_path": "계정>명",
+      "domain": "명칭(100)",
+      "desc": "표시명(팀명·시스템명). 개인 성명은 저장하지 않음"
+    },
+    {
+      "kor": "계정유형코드",
+      "phys": "acct_type_cd",
+      "word_path": "계정>유형>코드",
+      "domain": "계정유형",
+      "desc": null
+    },
+    {
+      "kor": "관리자여부",
+      "phys": "admin_yn",
+      "word_path": "관리자>여부",
+      "domain": "여부",
+      "desc": null
+    },
+    {
+      "kor": "비밀번호해시",
+      "phys": "pwd_hash",
+      "word_path": "비밀번호>해시",
+      "domain": "해시문",
+      "desc": "API 키만 쓰는 시스템 계정은 NULL"
+    },
+    {
+      "kor": "계정분류권한",
+      "phys": "account_category",
+      "word_path": "계정>분류",
+      "domain": null,
+      "desc": "계정이 보유한 분류 권한(N:M)"
+    },
+    {
+      "kor": "계정키",
+      "phys": "account_key",
+      "word_path": "계정>키",
+      "domain": null,
+      "desc": "팀·시스템 계정용 API 키. 키 원문은 저장하지 않고 HMAC 해시만 보관"
+    },
+    {
+      "kor": "키식별자",
+      "phys": "key_id",
+      "word_path": "키>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "키접두",
+      "phys": "key_prefix",
+      "word_path": "키>접두",
+      "domain": "키접두",
+      "desc": null
+    },
+    {
+      "kor": "키해시",
+      "phys": "key_hash",
+      "word_path": "키>해시",
+      "domain": "해시값",
+      "desc": null
+    },
+    {
+      "kor": "만료시각",
+      "phys": "expire_at",
+      "word_path": "만료>시각",
+      "domain": "시각",
+      "desc": null
+    },
+    {
+      "kor": "역할",
+      "phys": "role",
+      "word_path": "역할",
+      "domain": null,
+      "desc": "분류 권한·API 사용권한 묶음. 계정에 역할을 주면 묶음 전체가 부여됨"
+    },
+    {
+      "kor": "역할코드",
+      "phys": "role_cd",
+      "word_path": "역할>코드",
+      "domain": "코드(30)",
+      "desc": null
+    },
+    {
+      "kor": "역할명",
+      "phys": "role_nm",
+      "word_path": "역할>명",
+      "domain": "명칭(100)",
+      "desc": null
+    },
+    {
+      "kor": "역할설명",
+      "phys": "role_desc",
+      "word_path": "역할>설명",
+      "domain": "설명",
+      "desc": null
+    },
+    {
+      "kor": "역할분류권한",
+      "phys": "role_category",
+      "word_path": "역할>분류",
+      "domain": null,
+      "desc": "역할이 가진 분류 권한"
+    },
+    {
+      "kor": "역할멤버",
+      "phys": "role_member",
+      "word_path": "역할>멤버",
+      "domain": null,
+      "desc": "역할을 부여받은 계정"
+    },
+    {
+      "kor": "감사로그",
+      "phys": "audit_log",
+      "word_path": "감사>로그",
+      "domain": null,
+      "desc": "계정·권한·정책·API 변경 기록"
+    },
+    {
+      "kor": "로그식별자",
+      "phys": "log_id",
+      "word_path": "로그>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "행위코드",
+      "phys": "act_cd",
+      "word_path": "행위>코드",
+      "domain": "코드(30)",
+      "desc": null
+    },
+    {
+      "kor": "대상값",
+      "phys": "target_val",
+      "word_path": "대상>값",
+      "domain": "설명",
+      "desc": null
+    },
+    {
+      "kor": "상세값",
+      "phys": "dtl_val",
+      "word_path": "상세>값",
+      "domain": "JSON",
+      "desc": null
+    },
+    {
+      "kor": "객체정책",
+      "phys": "object_policy",
+      "word_path": "객체>정책",
+      "domain": null,
+      "desc": "스키마/테이블별 최소 등급·분류. 정책이 없으면 전체 허용. table_nm='*' 는 스키마 전체, 테이블 정책이 우선"
+    },
+    {
+      "kor": "정책식별자",
+      "phys": "plcy_id",
+      "word_path": "정책>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "스키마명",
+      "phys": "schema_nm",
+      "word_path": "스키마>명",
+      "domain": "물리명",
+      "desc": null
+    },
+    {
+      "kor": "테이블명",
+      "phys": "table_nm",
+      "word_path": "테이블>명",
+      "domain": "물리명",
+      "desc": null
+    },
+    {
+      "kor": "최소등급코드",
+      "phys": "min_grade_cd",
+      "word_path": "최소>등급>코드",
+      "domain": "코드(10)",
+      "desc": null
+    },
+    {
+      "kor": "API정의",
+      "phys": "api_definition",
+      "word_path": "API>정의",
+      "domain": null,
+      "desc": "등록 쿼리 기반 조회 API. SELECT 단일문만 허용, 호출자 DB 권한으로 실행"
+    },
+    {
+      "kor": "API식별자",
+      "phys": "api_id",
+      "word_path": "API>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "API명",
+      "phys": "api_nm",
+      "word_path": "API>명",
+      "domain": "API명",
+      "desc": "호출 경로 /q/{api_nm}"
+    },
+    {
+      "kor": "API설명",
+      "phys": "api_desc",
+      "word_path": "API>설명",
+      "domain": "설명",
+      "desc": null
+    },
+    {
+      "kor": "SQL값",
+      "phys": "sql_val",
+      "word_path": "SQL>값",
+      "domain": "SQL문",
+      "desc": null
+    },
+    {
+      "kor": "파라미터값",
+      "phys": "param_val",
+      "word_path": "파라미터>값",
+      "domain": "JSON",
+      "desc": "[{name,type,required,default}]"
+    },
+    {
+      "kor": "최대행수",
+      "phys": "max_row_cnt",
+      "word_path": "최대>행>수",
+      "domain": "건수",
+      "desc": null
+    },
+    {
+      "kor": "제한시간밀리초",
+      "phys": "timeout_ms",
+      "word_path": "제한시간>밀리초",
+      "domain": "밀리초",
+      "desc": null
+    },
+    {
+      "kor": "소유계정식별자",
+      "phys": "owner_acct_id",
+      "word_path": "소유>계정>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "API사용권한",
+      "phys": "api_grant",
+      "word_path": "API>부여",
+      "domain": null,
+      "desc": "API 사용권한 — 계정 또는 역할 단위로 관리자만 부여"
+    },
+    {
+      "kor": "부여식별자",
+      "phys": "grant_id",
+      "word_path": "부여>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "부여계정식별자",
+      "phys": "grant_acct_id",
+      "word_path": "부여>계정>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "행위정책",
+      "phys": "action_policy",
+      "word_path": "행위>정책",
+      "domain": null,
+      "desc": "플랫폼 행위별 최소 등급·관리자 필요 여부(로그인=목록 조회 이상)"
+    },
+    {
+      "kor": "행위명",
+      "phys": "act_nm",
+      "word_path": "행위>명",
+      "domain": "명칭(100)",
+      "desc": null
+    },
+    {
+      "kor": "호출로그",
+      "phys": "call_log",
+      "word_path": "호출>로그",
+      "domain": null,
+      "desc": "API 호출 기록. 파라미터 원문 대신 HMAC 해시"
+    },
+    {
+      "kor": "파라미터해시",
+      "phys": "param_hash",
+      "word_path": "파라미터>해시",
+      "domain": "해시값",
+      "desc": null
+    },
+    {
+      "kor": "행수",
+      "phys": "row_cnt",
+      "word_path": "행>수",
+      "domain": "건수",
+      "desc": null
+    },
+    {
+      "kor": "경과밀리초",
+      "phys": "elapsed_ms",
+      "word_path": "경과>밀리초",
+      "domain": "경과밀리초",
+      "desc": null
+    },
+    {
+      "kor": "결과코드",
+      "phys": "result_cd",
+      "word_path": "결과>코드",
+      "domain": "코드(30)",
+      "desc": null
+    },
+    {
+      "kor": "메시지값",
+      "phys": "msg_val",
+      "word_path": "메시지>값",
+      "domain": "설명",
+      "desc": null
+    },
+    {
+      "kor": "원천",
+      "phys": "source",
+      "word_path": "원천",
+      "domain": null,
+      "desc": "데이터 출처(파일·URL·API·공공데이터)"
+    },
+    {
+      "kor": "원천식별자",
+      "phys": "src_id",
+      "word_path": "원천>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "원천명",
+      "phys": "src_nm",
+      "word_path": "원천>명",
+      "domain": "명칭(200)",
+      "desc": null
+    },
+    {
+      "kor": "원천유형코드",
+      "phys": "src_type_cd",
+      "word_path": "원천>유형>코드",
+      "domain": "원천유형",
+      "desc": null
+    },
+    {
+      "kor": "원천URL",
+      "phys": "src_url",
+      "word_path": "원천>URL",
+      "domain": "URL",
+      "desc": null
+    },
+    {
+      "kor": "제공명",
+      "phys": "provider_nm",
+      "word_path": "제공>명",
+      "domain": "명칭(100)",
+      "desc": "제공 기관"
+    },
+    {
+      "kor": "라이선스명",
+      "phys": "license_nm",
+      "word_path": "라이선스>명",
+      "domain": "명칭(100)",
+      "desc": null
+    },
+    {
+      "kor": "원천설명",
+      "phys": "src_desc",
+      "word_path": "원천>설명",
+      "domain": "설명",
+      "desc": null
+    },
+    {
+      "kor": "작업",
+      "phys": "job",
+      "word_path": "작업",
+      "domain": null,
+      "desc": "적재 작업 1건 = 원천 1개 → 대상 테이블/데이터셋 1개"
+    },
+    {
+      "kor": "작업식별자",
+      "phys": "job_id",
+      "word_path": "작업>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "대상스키마명",
+      "phys": "target_schema_nm",
+      "word_path": "대상>스키마>명",
+      "domain": "물리명",
+      "desc": null
+    },
+    {
+      "kor": "대상테이블명",
+      "phys": "target_table_nm",
+      "word_path": "대상>테이블>명",
+      "domain": "물리명",
+      "desc": null
+    },
+    {
+      "kor": "저장유형코드",
+      "phys": "store_type_cd",
+      "word_path": "저장>유형>코드",
+      "domain": "저장유형",
+      "desc": null
+    },
+    {
+      "kor": "상태코드",
+      "phys": "status_cd",
+      "word_path": "상태>코드",
+      "domain": "작업상태",
+      "desc": null
+    },
+    {
+      "kor": "바이트수",
+      "phys": "byte_cnt",
+      "word_path": "바이트>수",
+      "domain": "건수",
+      "desc": null
+    },
+    {
+      "kor": "프로파일값",
+      "phys": "profile_val",
+      "word_path": "프로파일>값",
+      "domain": "JSON",
+      "desc": null
+    },
+    {
+      "kor": "승인값",
+      "phys": "aprv_val",
+      "word_path": "승인>값",
+      "domain": "JSON",
+      "desc": "{by, quote, physical_quote, at, plan_sha256, …} — 사용자 답 인용"
+    },
+    {
+      "kor": "시작시각",
+      "phys": "start_at",
+      "word_path": "시작>시각",
+      "domain": "시각",
+      "desc": null
+    },
+    {
+      "kor": "종료시각",
+      "phys": "end_at",
+      "word_path": "종료>시각",
+      "domain": "시각",
+      "desc": null
+    },
+    {
+      "kor": "레이크데이터셋",
+      "phys": "lake_dataset",
+      "word_path": "레이크>데이터셋",
+      "domain": null,
+      "desc": "디스크(Parquet) 기반 대용량·로그성 데이터 카탈로그. 조회는 DuckDB"
+    },
+    {
+      "kor": "데이터셋식별자",
+      "phys": "dataset_id",
+      "word_path": "데이터셋>식별자",
+      "domain": "식별자",
+      "desc": null
+    },
+    {
+      "kor": "데이터셋명",
+      "phys": "dataset_nm",
+      "word_path": "데이터셋>명",
+      "domain": "물리명",
+      "desc": null
+    },
+    {
+      "kor": "경로값",
+      "phys": "path_val",
+      "word_path": "경로>값",
+      "domain": "URL",
+      "desc": null
+    },
+    {
+      "kor": "파티션컬럼명",
+      "phys": "partition_col_nm",
+      "word_path": "파티션>컬럼>명",
+      "domain": "물리명",
+      "desc": null
+    },
+    {
+      "kor": "파일형식코드",
+      "phys": "file_fmt_cd",
+      "word_path": "파일>형식>코드",
+      "domain": "코드(10)",
+      "desc": null
+    }
+  ],
+  "tables": [
+    {
+      "name": "grade",
+      "schema": "sec",
+      "kor": "등급",
+      "kind": "코드",
+      "is_pi": false,
+      "description": "접근 등급. rank 가 클수록 상위(s=100). 계정은 등급 하나",
+      "columns": [
+        {
+          "name": "grade_cd",
+          "kor": "등급코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "pk": true
+        },
+        {
+          "name": "grade_nm",
+          "kor": "등급명",
+          "domain": "명칭(100)",
+          "nullable": false
+        },
+        {
+          "name": "grade_rank",
+          "kor": "등급순위",
+          "domain": "등급순위",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "seed": [
+        [
+          "s",
+          "S등급",
+          100
+        ],
+        [
+          "a",
+          "A등급",
+          90
+        ],
+        [
+          "b",
+          "B등급",
+          80
+        ],
+        [
+          "c",
+          "C등급",
+          70
+        ],
+        [
+          "d",
+          "D등급",
+          60
+        ],
+        [
+          "e",
+          "E등급",
+          50
+        ]
+      ]
+    },
+    {
+      "name": "category",
+      "schema": "sec",
+      "kor": "분류",
+      "kind": "코드",
+      "is_pi": false,
+      "description": "데이터 분류. 계정은 여러 분류 권한을 가질 수 있음",
+      "columns": [
+        {
+          "name": "ctgr_cd",
+          "kor": "분류코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "pk": true
+        },
+        {
+          "name": "ctgr_nm",
+          "kor": "분류명",
+          "domain": "명칭(100)",
+          "nullable": false
+        },
+        {
+          "name": "sort_no",
+          "kor": "순서번호",
+          "domain": "순서",
+          "nullable": false,
+          "default": "0"
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "seed": [
+        [
+          "PI",
+          "개인정보",
+          1
+        ],
+        [
+          "SALES",
+          "매출",
+          2
+        ],
+        [
+          "SCORE",
+          "성적",
+          3
+        ],
+        [
+          "HR",
+          "인사",
+          4
+        ],
+        [
+          "GA",
+          "총무",
+          5
+        ],
+        [
+          "SYS",
+          "시스템",
+          6
+        ]
+      ]
+    },
+    {
+      "name": "account",
+      "schema": "sec",
+      "kor": "계정",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "개인·팀·시스템 계정. 등급 1개 + 관리자 여부. 비밀번호는 argon2id 단방향",
+      "columns": [
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "login_id",
+          "kor": "로그인식별자",
+          "domain": "로그인ID",
+          "nullable": false,
+          "unique": true,
+          "description": "업무 자연키"
+        },
+        {
+          "name": "acct_nm",
+          "kor": "계정명",
+          "domain": "명칭(100)",
+          "nullable": false,
+          "description": "표시명(팀명·시스템명). 개인 성명은 저장하지 않음"
+        },
+        {
+          "name": "acct_type_cd",
+          "kor": "계정유형코드",
+          "domain": "계정유형",
+          "nullable": false,
+          "default": "'USER'"
+        },
+        {
+          "name": "grade_cd",
+          "kor": "등급코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "fk": {
+            "table": "grade",
+            "column": "grade_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "admin_yn",
+          "kor": "관리자여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "pwd_hash",
+          "kor": "비밀번호해시",
+          "domain": "해시문",
+          "nullable": true,
+          "crypto": "argon2",
+          "description": "API 키만 쓰는 시스템 계정은 NULL"
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "account_category",
+      "schema": "sec",
+      "kor": "계정분류권한",
+      "kind": "거래",
+      "is_pi": false,
+      "description": "계정이 보유한 분류 권한(N:M)",
+      "columns": [
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "ctgr_cd",
+          "kor": "분류코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "category",
+            "column": "ctgr_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "account_key",
+      "schema": "sec",
+      "kor": "계정키",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "팀·시스템 계정용 API 키. 키 원문은 저장하지 않고 HMAC 해시만 보관",
+      "columns": [
+        {
+          "name": "key_id",
+          "kor": "키식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "key_prefix",
+          "kor": "키접두",
+          "domain": "키접두",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "key_hash",
+          "kor": "키해시",
+          "domain": "해시값",
+          "nullable": false,
+          "crypto": "hmac"
+        },
+        {
+          "name": "expire_at",
+          "kor": "만료시각",
+          "domain": "시각",
+          "nullable": true
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "role",
+      "schema": "sec",
+      "kor": "역할",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "분류 권한·API 사용권한 묶음. 계정에 역할을 주면 묶음 전체가 부여됨",
+      "columns": [
+        {
+          "name": "role_cd",
+          "kor": "역할코드",
+          "domain": "코드(30)",
+          "nullable": false,
+          "pk": true
+        },
+        {
+          "name": "role_nm",
+          "kor": "역할명",
+          "domain": "명칭(100)",
+          "nullable": false
+        },
+        {
+          "name": "role_desc",
+          "kor": "역할설명",
+          "domain": "설명",
+          "nullable": true
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "role_category",
+      "schema": "sec",
+      "kor": "역할분류권한",
+      "kind": "거래",
+      "is_pi": false,
+      "description": "역할이 가진 분류 권한",
+      "columns": [
+        {
+          "name": "role_cd",
+          "kor": "역할코드",
+          "domain": "코드(30)",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "role",
+            "column": "role_cd",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "ctgr_cd",
+          "kor": "분류코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "category",
+            "column": "ctgr_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "role_member",
+      "schema": "sec",
+      "kor": "역할멤버",
+      "kind": "거래",
+      "is_pi": false,
+      "description": "역할을 부여받은 계정",
+      "columns": [
+        {
+          "name": "role_cd",
+          "kor": "역할코드",
+          "domain": "코드(30)",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "role",
+            "column": "role_cd",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "audit_log",
+      "schema": "sec",
+      "kor": "감사로그",
+      "kind": "이력",
+      "is_pi": false,
+      "description": "계정·권한·정책·API 변경 기록",
+      "columns": [
+        {
+          "name": "log_id",
+          "kor": "로그식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "SET NULL"
+          },
+          "description": "수행 계정"
+        },
+        {
+          "name": "act_cd",
+          "kor": "행위코드",
+          "domain": "코드(30)",
+          "nullable": false
+        },
+        {
+          "name": "target_val",
+          "kor": "대상값",
+          "domain": "설명",
+          "nullable": true
+        },
+        {
+          "name": "dtl_val",
+          "kor": "상세값",
+          "domain": "JSON",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "object_policy",
+      "schema": "meta",
+      "kor": "객체정책",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "스키마/테이블별 최소 등급·분류. 정책이 없으면 전체 허용. table_nm='*' 는 스키마 전체, 테이블 정책이 우선",
+      "columns": [
+        {
+          "name": "plcy_id",
+          "kor": "정책식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "schema_nm",
+          "kor": "스키마명",
+          "domain": "물리명",
+          "nullable": false
+        },
+        {
+          "name": "table_nm",
+          "kor": "테이블명",
+          "domain": "물리명",
+          "nullable": false,
+          "default": "'*'"
+        },
+        {
+          "name": "min_grade_cd",
+          "kor": "최소등급코드",
+          "domain": "코드(10)",
+          "nullable": true,
+          "fk": {
+            "table": "grade",
+            "column": "grade_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "ctgr_cd",
+          "kor": "분류코드",
+          "domain": "코드(10)",
+          "nullable": true,
+          "fk": {
+            "table": "category",
+            "column": "ctgr_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "uniques": [
+        [
+          "schema_nm",
+          "table_nm"
+        ]
+      ]
+    },
+    {
+      "name": "api_definition",
+      "schema": "api",
+      "kor": "API정의",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "등록 쿼리 기반 조회 API. SELECT 단일문만 허용, 호출자 DB 권한으로 실행",
+      "columns": [
+        {
+          "name": "api_id",
+          "kor": "API식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "api_nm",
+          "kor": "API명",
+          "domain": "API명",
+          "nullable": false,
+          "unique": true,
+          "description": "호출 경로 /q/{api_nm}"
+        },
+        {
+          "name": "api_desc",
+          "kor": "API설명",
+          "domain": "설명",
+          "nullable": true
+        },
+        {
+          "name": "sql_val",
+          "kor": "SQL값",
+          "domain": "SQL문",
+          "nullable": false
+        },
+        {
+          "name": "param_val",
+          "kor": "파라미터값",
+          "domain": "JSON",
+          "nullable": false,
+          "default": "'[]'::jsonb",
+          "description": "[{name,type,required,default}]"
+        },
+        {
+          "name": "max_row_cnt",
+          "kor": "최대행수",
+          "domain": "건수",
+          "nullable": false,
+          "default": "10000"
+        },
+        {
+          "name": "timeout_ms",
+          "kor": "제한시간밀리초",
+          "domain": "밀리초",
+          "nullable": false,
+          "default": "15000"
+        },
+        {
+          "name": "owner_acct_id",
+          "kor": "소유계정식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "SET NULL"
+          }
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "api_grant",
+      "schema": "api",
+      "kor": "API사용권한",
+      "kind": "거래",
+      "is_pi": false,
+      "description": "API 사용권한 — 계정 또는 역할 단위로 관리자만 부여",
+      "columns": [
+        {
+          "name": "grant_id",
+          "kor": "부여식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "api_id",
+          "kor": "API식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "fk": {
+            "table": "api_definition",
+            "column": "api_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "role_cd",
+          "kor": "역할코드",
+          "domain": "코드(30)",
+          "nullable": true,
+          "fk": {
+            "table": "role",
+            "column": "role_cd",
+            "on_delete": "CASCADE"
+          }
+        },
+        {
+          "name": "grant_acct_id",
+          "kor": "부여계정식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "SET NULL"
+          }
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "uniques": [
+        [
+          "api_id",
+          "acct_id"
+        ],
+        [
+          "api_id",
+          "role_cd"
+        ]
+      ],
+      "checks": [
+        {
+          "name": "target",
+          "expr": "(acct_id IS NOT NULL) <> (role_cd IS NOT NULL)"
+        }
+      ]
+    },
+    {
+      "name": "action_policy",
+      "schema": "api",
+      "kor": "행위정책",
+      "kind": "코드",
+      "is_pi": false,
+      "description": "플랫폼 행위별 최소 등급·관리자 필요 여부(로그인=목록 조회 이상)",
+      "columns": [
+        {
+          "name": "act_cd",
+          "kor": "행위코드",
+          "domain": "코드(30)",
+          "nullable": false,
+          "pk": true
+        },
+        {
+          "name": "act_nm",
+          "kor": "행위명",
+          "domain": "명칭(100)",
+          "nullable": false
+        },
+        {
+          "name": "min_grade_cd",
+          "kor": "최소등급코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "fk": {
+            "table": "grade",
+            "column": "grade_cd",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "admin_yn",
+          "kor": "관리자여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "false"
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ],
+      "seed_cols": [
+        "act_cd",
+        "act_nm",
+        "min_grade_cd",
+        "admin_yn"
+      ],
+      "seed": [
+        [
+          "LOGIN",
+          "로그인",
+          "b",
+          false
+        ],
+        [
+          "LIST",
+          "API 목록 조회",
+          "b",
+          false
+        ],
+        [
+          "MODIFY",
+          "API 생성·변경·삭제",
+          "a",
+          true
+        ],
+        [
+          "GRANT",
+          "API 사용권한 부여·회수",
+          "a",
+          true
+        ],
+        [
+          "CALL",
+          "API 호출(사용권한 별도 필요)",
+          "e",
+          false
+        ],
+        [
+          "ACCOUNT",
+          "계정·등급·분류·정책 관리",
+          "a",
+          true
+        ],
+        [
+          "INGEST",
+          "데이터 적재 실행(승인 인용 필수)",
+          "a",
+          false
+        ]
+      ]
+    },
+    {
+      "name": "call_log",
+      "schema": "api",
+      "kor": "호출로그",
+      "kind": "이력",
+      "is_pi": false,
+      "description": "API 호출 기록. 파라미터 원문 대신 HMAC 해시",
+      "columns": [
+        {
+          "name": "log_id",
+          "kor": "로그식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "api_id",
+          "kor": "API식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "api_definition",
+            "column": "api_id",
+            "on_delete": "SET NULL"
+          }
+        },
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "SET NULL"
+          }
+        },
+        {
+          "name": "param_hash",
+          "kor": "파라미터해시",
+          "domain": "해시값",
+          "nullable": true,
+          "crypto": "hmac"
+        },
+        {
+          "name": "row_cnt",
+          "kor": "행수",
+          "domain": "건수",
+          "nullable": true
+        },
+        {
+          "name": "elapsed_ms",
+          "kor": "경과밀리초",
+          "domain": "경과밀리초",
+          "nullable": true
+        },
+        {
+          "name": "result_cd",
+          "kor": "결과코드",
+          "domain": "코드(30)",
+          "nullable": false
+        },
+        {
+          "name": "msg_val",
+          "kor": "메시지값",
+          "domain": "설명",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "source",
+      "schema": "ingest",
+      "kor": "원천",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "데이터 출처(파일·URL·API·공공데이터)",
+      "columns": [
+        {
+          "name": "src_id",
+          "kor": "원천식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "src_nm",
+          "kor": "원천명",
+          "domain": "명칭(200)",
+          "nullable": false
+        },
+        {
+          "name": "src_type_cd",
+          "kor": "원천유형코드",
+          "domain": "원천유형",
+          "nullable": false
+        },
+        {
+          "name": "src_url",
+          "kor": "원천URL",
+          "domain": "URL",
+          "nullable": true
+        },
+        {
+          "name": "provider_nm",
+          "kor": "제공명",
+          "domain": "명칭(100)",
+          "nullable": true,
+          "description": "제공 기관"
+        },
+        {
+          "name": "license_nm",
+          "kor": "라이선스명",
+          "domain": "명칭(100)",
+          "nullable": true
+        },
+        {
+          "name": "src_desc",
+          "kor": "원천설명",
+          "domain": "설명",
+          "nullable": true
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "job",
+      "schema": "ingest",
+      "kor": "작업",
+      "kind": "거래",
+      "is_pi": false,
+      "description": "적재 작업 1건 = 원천 1개 → 대상 테이블/데이터셋 1개",
+      "columns": [
+        {
+          "name": "job_id",
+          "kor": "작업식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "src_id",
+          "kor": "원천식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "fk": {
+            "table": "source",
+            "column": "src_id",
+            "on_delete": "RESTRICT"
+          }
+        },
+        {
+          "name": "target_schema_nm",
+          "kor": "대상스키마명",
+          "domain": "물리명",
+          "nullable": true
+        },
+        {
+          "name": "target_table_nm",
+          "kor": "대상테이블명",
+          "domain": "물리명",
+          "nullable": true
+        },
+        {
+          "name": "store_type_cd",
+          "kor": "저장유형코드",
+          "domain": "저장유형",
+          "nullable": false,
+          "default": "'DB'"
+        },
+        {
+          "name": "status_cd",
+          "kor": "상태코드",
+          "domain": "작업상태",
+          "nullable": false,
+          "default": "'READY'"
+        },
+        {
+          "name": "row_cnt",
+          "kor": "행수",
+          "domain": "건수",
+          "nullable": true
+        },
+        {
+          "name": "byte_cnt",
+          "kor": "바이트수",
+          "domain": "건수",
+          "nullable": true
+        },
+        {
+          "name": "profile_val",
+          "kor": "프로파일값",
+          "domain": "JSON",
+          "nullable": true
+        },
+        {
+          "name": "msg_val",
+          "kor": "메시지값",
+          "domain": "설명",
+          "nullable": true
+        },
+        {
+          "name": "aprv_val",
+          "kor": "승인값",
+          "domain": "JSON",
+          "nullable": true,
+          "description": "{by, quote, physical_quote, at, plan_sha256, …} — 사용자 답 인용"
+        },
+        {
+          "name": "start_at",
+          "kor": "시작시각",
+          "domain": "시각",
+          "nullable": true
+        },
+        {
+          "name": "end_at",
+          "kor": "종료시각",
+          "domain": "시각",
+          "nullable": true
+        },
+        {
+          "name": "acct_id",
+          "kor": "계정식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "account",
+            "column": "acct_id",
+            "on_delete": "SET NULL"
+          }
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    },
+    {
+      "name": "lake_dataset",
+      "schema": "ingest",
+      "kor": "레이크데이터셋",
+      "kind": "기준",
+      "is_pi": false,
+      "description": "디스크(Parquet) 기반 대용량·로그성 데이터 카탈로그. 조회는 DuckDB",
+      "columns": [
+        {
+          "name": "dataset_id",
+          "kor": "데이터셋식별자",
+          "domain": "식별자",
+          "nullable": false,
+          "pk": true,
+          "identity": true
+        },
+        {
+          "name": "dataset_nm",
+          "kor": "데이터셋명",
+          "domain": "물리명",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "path_val",
+          "kor": "경로값",
+          "domain": "URL",
+          "nullable": false
+        },
+        {
+          "name": "partition_col_nm",
+          "kor": "파티션컬럼명",
+          "domain": "물리명",
+          "nullable": true
+        },
+        {
+          "name": "file_fmt_cd",
+          "kor": "파일형식코드",
+          "domain": "코드(10)",
+          "nullable": false,
+          "default": "'PARQUET'"
+        },
+        {
+          "name": "row_cnt",
+          "kor": "행수",
+          "domain": "건수",
+          "nullable": true
+        },
+        {
+          "name": "byte_cnt",
+          "kor": "바이트수",
+          "domain": "건수",
+          "nullable": true
+        },
+        {
+          "name": "src_id",
+          "kor": "원천식별자",
+          "domain": "식별자",
+          "nullable": true,
+          "fk": {
+            "table": "source",
+            "column": "src_id",
+            "on_delete": "SET NULL"
+          }
+        },
+        {
+          "name": "use_yn",
+          "kor": "사용여부",
+          "domain": "여부",
+          "nullable": false,
+          "default": "true"
+        },
+        {
+          "name": "created_at",
+          "kor": "생성시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        },
+        {
+          "name": "updated_at",
+          "kor": "수정시각",
+          "domain": "시각",
+          "nullable": false,
+          "default": "now()"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from": "account",
+      "from_col": "grade_cd",
+      "to": "grade",
+      "to_col": "grade_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "계정.등급코드 → grade"
+    },
+    {
+      "from": "account_category",
+      "from_col": "acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "계정분류권한.계정식별자 → account"
+    },
+    {
+      "from": "account_category",
+      "from_col": "ctgr_cd",
+      "to": "category",
+      "to_col": "ctgr_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "계정분류권한.분류코드 → category"
+    },
+    {
+      "from": "account_key",
+      "from_col": "acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "계정키.계정식별자 → account"
+    },
+    {
+      "from": "role_category",
+      "from_col": "role_cd",
+      "to": "role",
+      "to_col": "role_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "역할분류권한.역할코드 → role"
+    },
+    {
+      "from": "role_category",
+      "from_col": "ctgr_cd",
+      "to": "category",
+      "to_col": "ctgr_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "역할분류권한.분류코드 → category"
+    },
+    {
+      "from": "role_member",
+      "from_col": "role_cd",
+      "to": "role",
+      "to_col": "role_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "역할멤버.역할코드 → role"
+    },
+    {
+      "from": "role_member",
+      "from_col": "acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "역할멤버.계정식별자 → account"
+    },
+    {
+      "from": "audit_log",
+      "from_col": "acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "SET NULL",
+      "meaning": "감사로그.계정식별자 → account"
+    },
+    {
+      "from": "object_policy",
+      "from_col": "min_grade_cd",
+      "to": "grade",
+      "to_col": "grade_cd",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "RESTRICT",
+      "meaning": "객체정책.최소등급코드 → grade"
+    },
+    {
+      "from": "object_policy",
+      "from_col": "ctgr_cd",
+      "to": "category",
+      "to_col": "ctgr_cd",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "RESTRICT",
+      "meaning": "객체정책.분류코드 → category"
+    },
+    {
+      "from": "api_definition",
+      "from_col": "owner_acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "SET NULL",
+      "meaning": "API정의.소유계정식별자 → account"
+    },
+    {
+      "from": "api_grant",
+      "from_col": "api_id",
+      "to": "api_definition",
+      "to_col": "api_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "CASCADE",
+      "meaning": "API사용권한.API식별자 → api_definition"
+    },
+    {
+      "from": "api_grant",
+      "from_col": "acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "CASCADE",
+      "meaning": "API사용권한.계정식별자 → account"
+    },
+    {
+      "from": "api_grant",
+      "from_col": "role_cd",
+      "to": "role",
+      "to_col": "role_cd",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "CASCADE",
+      "meaning": "API사용권한.역할코드 → role"
+    },
+    {
+      "from": "api_grant",
+      "from_col": "grant_acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "SET NULL",
+      "meaning": "API사용권한.부여계정식별자 → account"
+    },
+    {
+      "from": "action_policy",
+      "from_col": "min_grade_cd",
+      "to": "grade",
+      "to_col": "grade_cd",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "행위정책.최소등급코드 → grade"
+    },
+    {
+      "from": "call_log",
+      "from_col": "api_id",
+      "to": "api_definition",
+      "to_col": "api_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "SET NULL",
+      "meaning": "호출로그.API식별자 → api_definition"
+    },
+    {
+      "from": "call_log",
+      "from_col": "acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "SET NULL",
+      "meaning": "호출로그.계정식별자 → account"
+    },
+    {
+      "from": "job",
+      "from_col": "src_id",
+      "to": "source",
+      "to_col": "src_id",
+      "type": "N:1",
+      "optional": false,
+      "on_delete": "RESTRICT",
+      "meaning": "작업.원천식별자 → source"
+    },
+    {
+      "from": "job",
+      "from_col": "acct_id",
+      "to": "account",
+      "to_col": "acct_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "SET NULL",
+      "meaning": "작업.계정식별자 → account"
+    },
+    {
+      "from": "lake_dataset",
+      "from_col": "src_id",
+      "to": "source",
+      "to_col": "src_id",
+      "type": "N:1",
+      "optional": true,
+      "on_delete": "SET NULL",
+      "meaning": "레이크데이터셋.원천식별자 → source"
+    }
+  ],
+  "access_policies": [
+    {
+      "schema": "sec",
+      "table": "*",
+      "min_grade": "a",
+      "category": "SYS",
+      "meaning": "계정·권한 — 시스템 분류 + A 이상"
+    },
+    {
+      "schema": "api",
+      "table": "*",
+      "min_grade": "a",
+      "category": "SYS",
+      "meaning": "API 정의·로그 — 시스템 분류 + A 이상"
+    },
+    {
+      "schema": "ingest",
+      "table": "*",
+      "min_grade": "b",
+      "category": "SYS",
+      "meaning": "적재 이력 — 시스템 분류 + B 이상"
+    },
+    {
+      "schema": "pi",
+      "table": "*",
+      "min_grade": null,
+      "category": "PI",
+      "meaning": "개인정보 스키마 — 개인정보 분류 보유자만"
+    }
+  ],
+  "pi_suggestions": [
+    "비밀번호 argon2id, API 키·호출 파라미터는 HMAC-SHA256(128bit 키) — 원문 미보관"
+  ],
+  "dq_notes": [
+    "모든 테이블 PK·감사 컬럼",
+    "코드성 값은 코드 테이블 또는 CHECK",
+    "API 사용권한은 계정/역할 중 하나만(CHECK)"
+  ]
+}

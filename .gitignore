@@ -1,0 +1,11 @@
+# 비밀·환경별 설정 (암호화 키 포함) — 절대 커밋 금지
+config/system.yaml
+runtime/config/system.yaml
+*.secret.yaml
+.env
+# 실행 산출물
+work/
+data_lake/
+__pycache__/
+*.pyc
+.pytest_cache/

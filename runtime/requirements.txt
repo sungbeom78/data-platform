@@ -1,0 +1,15 @@
+psycopg[binary]>=3.1
+pandas>=2.0
+openpyxl>=3.1
+pyyaml>=6.0
+cryptography>=41
+argon2-cffi>=23
+charset-normalizer>=3
+httpx>=0.25
+pglast>=6
+fastapi>=0.110
+uvicorn>=0.27
+PyJWT>=2.8
+pyarrow>=14
+duckdb>=1.0
+pytest>=8
